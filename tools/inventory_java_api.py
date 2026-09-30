@@ -214,7 +214,9 @@ def main():
             if path.suffix == '.gz' and existing is not None:
                 current, expected = gzip.decompress(existing), gzip.decompress(content)
             else:
-                current, expected = existing, content
+                # Windows Git checkouts may convert Markdown LF to CRLF.
+                current = None if existing is None else existing.replace(b'\r\n', b'\n')
+                expected = content
             if current != expected:
                 stale.append(str(path.relative_to(ROOT)))
         else:
