@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from oculix import Location, OCR, Pattern, Region
 from oculix._bridge import Bridge, BridgeError, RemoteObject
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -83,3 +84,75 @@ def test_chain_returns_same_ref(bridge):
     sb = bridge.create("java.lang.StringBuilder", [])
     chained = sb._call("append", "x")
     assert chained._ref == sb._ref
+
+
+def test_real_location_constructor_arguments_and_chain(bridge):
+    location = bridge.create(Location.JAVA_CLASS, [10, 20])
+    assert isinstance(location, Location)
+    assert location.setX(25) is location
+    assert location.getX() == 25
+    copy = bridge.create(Location.JAVA_CLASS, [location])
+    assert isinstance(copy, Location)
+    assert copy is not location
+    assert copy.getX() == 25
+    assert copy.getY() == 20
+
+
+def test_real_wrapper_constructor_interning(bridge, monkeypatch):
+    import oculix
+    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    location = Location(10, 20)
+    assert location.setY(30) is location
+    assert location.getY() == 30
+
+
+def test_real_pattern_chain(bridge):
+    pattern = bridge.create(Pattern.JAVA_CLASS, ['button.png'])
+    assert isinstance(pattern, Pattern)
+    assert pattern.similar(0.7) is pattern
+    assert pattern.getSimilar() == pytest.approx(0.7)
+
+
+def test_real_ocr_options_clone_and_chaining(bridge):
+    options = bridge.create(OCR.Options.JAVA_CLASS, [])
+    assert isinstance(options, OCR.Options)
+    assert options.language('hin') is options
+    clone = options.clone()
+    assert isinstance(clone, OCR.Options)
+    assert clone is not options
+    assert clone.language() == 'hin'
+    assert clone.language('eng') is clone
+    assert options.language() == 'hin'
+
+
+def test_real_global_ocr_options_static_factory(bridge, monkeypatch):
+    import oculix
+    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    options = OCR.globalOptions()
+    assert isinstance(options, OCR.Options)
+    assert OCR.globalOptions() is options
+
+
+@pytest.mark.skipif(os.environ.get('OCULIX_DESKTOP_TESTS') != '1', reason='Requires a real graphical desktop; set OCULIX_DESKTOP_TESTS=1')
+def test_real_virtual_region_result_and_reference_argument(bridge):
+    rectangle = bridge.create('java.awt.Rectangle', [10, 20, 30, 40])
+    region = bridge.call_static(Region.JAVA_CLASS, 'virtual', [rectangle])
+    assert isinstance(region, Region)
+    assert region.getX() == 10
+    assert region.getY() == 20
+    assert region.getW() == 30
+    assert region.getH() == 40
+
+
+def test_invoked_java_error_exposes_cause(bridge):
+    with pytest.raises(BridgeError, match='NumberFormatException'):
+        bridge.call_static('java.lang.Integer', 'parseInt', ['not-an-integer'])
+
+
+@pytest.mark.skipif(os.environ.get('OCULIX_OCR_TESTS') != '1', reason='Opt-in native OCR smoke test; set OCULIX_OCR_TESTS=1')
+def test_real_ocr_image_read(bridge):
+    options = bridge.create(OCR.Options.JAVA_CLASS, [])
+    options.language('eng').psm(7)
+    image = str(Path(__file__).parent / 'fixtures/ocr-submit.png')
+    text = bridge.call_static(OCR.JAVA_CLASS, 'readText', [image, options])
+    assert 'Submit 12345' in text

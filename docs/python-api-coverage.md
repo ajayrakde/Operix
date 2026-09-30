@@ -1,0 +1,1968 @@
+# Python wrapper coverage against Oculix 4.0.0
+
+Generated from the pinned bridge JAR by `tools/inventory_java_api.py`.
+
+**Name and arity coverage is not verified semantic parity.** It only means an
+explicit Python method accepts the Java argument count and has matching
+static/instance placement. It does not verify parameter types, overload
+selection, return annotations, defaults, callbacks or runtime behavior.
+
+The complete machine inventory includes inherited methods, constructors,
+public fields, exception types and generic types. `java.lang.Object` methods
+are retained in that inventory but excluded from coverage counts below.
+
+- Public Java classes/interfaces/enums inventoried: **211**.
+- Java types with a Python class facade: **16** (including the static OCR facade).
+- Public method overloads across classes, including inheritance: **13574**.
+- Overloads with an explicit Python name and matching arity/staticness: **217**.
+- Remaining method overloads: **13357**.
+- Constructors and fields are inventoried but not included in method-coverage totals.
+- Dynamic forwarding is not counted as explicit coverage.
+- The broad inventory includes Oculix support, remote and guide packages, not only desktop automation.
+
+## Existing wrapper classes
+
+| Java class | Overloads | Explicit name + arity | Missing or incompatible |
+|---|---:|---:|---:|
+| `com.sikulix.ocr.PaddleOCRClient` | 11 | 0 | 11 |
+| `com.sikulix.ocr.PaddleOCREngine` | 8 | 0 | 8 |
+| `com.sikulix.ocr.TesseractEngine` | 9 | 0 | 9 |
+| `com.sikulix.util.SSHTunnel` | 7 | 1 | 6 |
+| `org.sikuli.android.ADBScreen` | 310 | 5 | 305 |
+| `org.sikuli.script.App` | 57 | 8 | 49 |
+| `org.sikuli.script.Image` | 119 | 0 | 119 |
+| `org.sikuli.script.Location` | 44 | 2 | 42 |
+| `org.sikuli.script.Match` | 295 | 63 | 232 |
+| `org.sikuli.script.OCR` | 16 | 7 | 9 |
+| `org.sikuli.script.OCR$Options` | 33 | 0 | 33 |
+| `org.sikuli.script.Pattern` | 35 | 4 | 31 |
+| `org.sikuli.script.Region` | 279 | 60 | 219 |
+| `org.sikuli.script.Screen` | 322 | 63 | 259 |
+| `org.sikuli.script.ScreenImage` | 19 | 0 | 19 |
+| `org.sikuli.vnc.VNCScreen` | 314 | 4 | 310 |
+
+## Python declarations absent from the Java class
+
+These declarations need correction or removal; a dynamic call cannot make
+a nonexistent Java method work. Constructors and private helpers are excluded.
+
+- `com.sikulix.ocr.PaddleOCREngine`: `getInstance`.
+- `org.sikuli.android.ADBScreen`: `swipe`, `tap`.
+- `org.sikuli.script.Match`: `capture`.
+- `org.sikuli.script.Region`: `capture`.
+
+## Missing signatures in existing wrapper classes
+
+Signatures below identify missing or incompatible declarations. Parameter
+names are marked absent in the machine inventory when the Java artifact
+was compiled without parameter-name metadata; `arg0` is not an original
+source parameter name.
+
+### `com.sikulix.ocr.PaddleOCRClient`
+
+- `boolean isServerAlive()` — missing.
+- `boolean isServerAlive(int)` — missing.
+- `java.lang.String getServerInfo()` — missing.
+- `java.lang.String getServerUrl()` — missing.
+- `java.lang.String recognize(java.lang.String)` — missing.
+- `java.util.List recognizeAndParseTexts(java.lang.String)` — missing.
+- `static int[] findTextCoordinates(java.lang.String, java.lang.String)` — missing.
+- `static java.util.List findAllTextCoordinates(java.lang.String, java.lang.String)` — missing.
+- `static java.util.List parseTextFromOCRResponse(java.lang.String)` — missing.
+- `static java.util.Map parseTextWithConfidence(java.lang.String)` — missing.
+- `static void printOCRStats(java.lang.String)` — missing.
+
+### `com.sikulix.ocr.PaddleOCREngine`
+
+- `boolean isAvailable()` — missing.
+- `com.sikulix.ocr.PaddleOCRClient getClient()` — missing.
+- `int[] findTextCoordinates(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String getName()` — missing.
+- `java.lang.String recognize(java.lang.String)` — missing.
+- `java.util.List findAllTextCoordinates(java.lang.String, java.lang.String)` — missing.
+- `java.util.List parseTexts(java.lang.String)` — missing.
+- `java.util.Map parseTextWithConfidence(java.lang.String)` — missing.
+
+### `com.sikulix.ocr.TesseractEngine`
+
+- `boolean isAvailable()` — missing.
+- `com.sikulix.ocr.TesseractEngine setDataPath(java.lang.String)` — missing.
+- `int[] findTextCoordinates(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String getDataPath()` — missing.
+- `java.lang.String getName()` — missing.
+- `java.lang.String recognize(java.lang.String)` — missing.
+- `java.util.List findAllTextCoordinates(java.lang.String, java.lang.String)` — missing.
+- `java.util.List parseTexts(java.lang.String)` — missing.
+- `java.util.Map parseTextWithConfidence(java.lang.String)` — missing.
+
+### `com.sikulix.util.SSHTunnel`
+
+- `boolean isConnected()` — missing.
+- `int getLocalPort()` — missing.
+- `static com.sikulix.util.SSHTunnel open(java.lang.String, int, java.lang.String, java.lang.String)` — static_mismatch.
+- `static com.sikulix.util.SSHTunnel open(java.lang.String, int, java.lang.String, java.lang.String, java.lang.String, int, int)` — static_mismatch.
+- `static com.sikulix.util.SSHTunnel open(java.lang.String, java.lang.String, java.lang.String)` — static_mismatch.
+- `static com.sikulix.util.SSHTunnel openAutoPort(java.lang.String, int, java.lang.String, java.lang.String, java.lang.String, int)` — missing.
+
+### `org.sikuli.android.ADBScreen`
+
+- `int click(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int doubleClick(java.lang.Object)` — missing.
+- `int doubleClick(java.lang.Object, java.lang.Integer)` — missing.
+- `int drag(java.lang.Object)` — missing.
+- `int dragDrop(java.lang.Object)` — missing.
+- `int dragDrop(java.lang.Object, java.lang.Object)` — missing.
+- `int dropAt(java.lang.Object)` — missing.
+- `int hover(java.lang.Object)` — missing.
+- `int mouseMove(java.lang.Object)` — missing.
+- `int paste(java.lang.Object, java.lang.String)` — missing.
+- `int rightClick(java.lang.Object)` — missing.
+- `int rightClick(java.lang.Object, java.lang.Integer)` — missing.
+- `int type(java.lang.Object, java.lang.String)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(java.lang.Object, int, int)` — missing.
+- `int wheel(java.lang.Object, int, int, int)` — missing.
+- `void aSwipe(java.lang.Object, java.lang.Object)` — missing.
+- `void aTap(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object, double)` — missing.
+- `boolean waitVanish(java.lang.Object)` — missing.
+- `boolean waitVanish(java.lang.Object, double)` — missing.
+- `java.lang.String onAppear(java.lang.Object)` — missing.
+- `java.lang.String onAppear(java.lang.Object, java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object, java.lang.Object)` — missing.
+- `java.util.Iterator findAll(java.lang.Object)` — missing.
+- `java.util.List findAllByColumn(java.lang.Object)` — missing.
+- `java.util.List findAllByRow(java.lang.Object)` — missing.
+- `java.util.List findAllList(java.lang.Object)` — missing.
+- `java.util.List getAll(java.lang.Object)` — missing.
+- `org.sikuli.script.Match exists(java.lang.Object)` — missing.
+- `org.sikuli.script.Match exists(java.lang.Object, double)` — missing.
+- `org.sikuli.script.Match find(java.lang.Object)` — missing.
+- `org.sikuli.script.Match wait(java.lang.Object)` — missing.
+- `org.sikuli.script.Match wait(java.lang.Object, double)` — missing.
+- `org.sikuli.script.Region unionAll(java.lang.Object)` — missing.
+- `boolean isValid()` — missing.
+- `boolean hasT(java.lang.String)` — missing.
+- `boolean contains(org.sikuli.script.Location)` — missing.
+- `boolean contains(org.sikuli.script.Region)` — missing.
+- `boolean containsMouse()` — missing.
+- `boolean getThrowException()` — missing.
+- `boolean hasEvents()` — missing.
+- `boolean hasObserver()` — missing.
+- `boolean hasText(java.lang.String)` — missing.
+- `boolean isObserving()` — missing.
+- `boolean isOtherScreen()` — missing.
+- `boolean isRasterValid()` — missing.
+- `boolean isVirtual()` — missing.
+- `boolean observe()` — missing.
+- `boolean observe(double)` — missing.
+- `boolean observeInBackground()` — missing.
+- `boolean observeInBackground(double)` — missing.
+- `boolean observeInLine(double)` — missing.
+- `boolean waitForStable()` — missing.
+- `boolean waitForStable(long, long)` — missing.
+- `boolean waitForStable(long, long, double)` — missing.
+- `double getAutoWaitTimeout()` — missing.
+- `float getObserveScanRate()` — missing.
+- `float getWaitScanRate()` — missing.
+- `int getID()` — missing.
+- `int getIdFromPoint(int, int)` — missing.
+- `int getH()` — missing.
+- `int getW()` — missing.
+- `int getX()` — missing.
+- `int getY()` — missing.
+- `int click()` — arity_mismatch.
+- `int doubleClick()` — missing.
+- `int getColW()` — missing.
+- `int getCols()` — missing.
+- `int getRepeatWaitTime()` — missing.
+- `int getRowH()` — missing.
+- `int getRows()` — missing.
+- `int hover()` — missing.
+- `int mouseMove()` — missing.
+- `int mouseMove(int, int)` — missing.
+- `int paste(java.lang.String)` — missing.
+- `int rightClick()` — missing.
+- `int type(java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(int, int)` — missing.
+- `int write(java.lang.String)` — missing.
+- `java.awt.Rectangle getBounds()` — missing.
+- `java.awt.Rectangle getRect()` — missing.
+- `java.io.File file()` — missing.
+- `java.lang.Object action(java.lang.String, java.lang.Object[])` — missing.
+- `java.lang.String exec(java.lang.String, java.lang.String[])` — missing.
+- `java.lang.String getDeviceDescription()` — missing.
+- `java.lang.String getIDString()` — missing.
+- `java.lang.String toString()` — missing.
+- `java.lang.String fileName()` — missing.
+- `java.lang.String getName()` — missing.
+- `java.lang.String text()` — missing.
+- `java.lang.String textChar()` — missing.
+- `java.lang.String textLine()` — missing.
+- `java.lang.String textWord()` — missing.
+- `java.lang.String getLastScreenImageFile()` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String)` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String onChange()` — missing.
+- `java.lang.String onChange(java.lang.Integer)` — missing.
+- `java.lang.String onChange(java.lang.Integer, java.lang.Object)` — missing.
+- `java.lang.String onChange(java.lang.Object)` — missing.
+- `java.lang.String saveCapture(java.lang.Object[])` — missing.
+- `java.lang.String toStringShort()` — missing.
+- `java.util.Iterator getLastMatches()` — missing.
+- `java.util.List collectLinesText()` — missing.
+- `java.util.List collectWordsText()` — missing.
+- `java.util.List textLines()` — missing.
+- `java.util.List textWords()` — missing.
+- `java.util.List collectLines()` — missing.
+- `java.util.List collectWords()` — missing.
+- `java.util.List findAllT(java.lang.String)` — missing.
+- `java.util.List findLines()` — missing.
+- `java.util.List findLines(java.lang.String)` — missing.
+- `java.util.List findWords()` — missing.
+- `java.util.List findWords(java.lang.String)` — missing.
+- `java.util.List findAllText(java.lang.String)` — missing.
+- `java.util.List findAny(java.lang.Object[])` — missing.
+- `java.util.List findAnyList(java.util.List)` — missing.
+- `java.util.List waitAny(double, java.lang.Object[])` — missing.
+- `java.util.List waitAnyList(double, java.util.List)` — missing.
+- `org.sikuli.android.ADBDevice getDevice()` — missing.
+- `org.sikuli.script.FindFailedResponse getFindFailedResponse()` — missing.
+- `org.sikuli.script.Image getImage()` — missing.
+- `org.sikuli.script.Location newLocation(int, int)` — missing.
+- `org.sikuli.script.Location newLocation(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Location set(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Location setOther(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Location aboveAt()` — missing.
+- `org.sikuli.script.Location aboveAt(int)` — missing.
+- `org.sikuli.script.Location asOffset()` — missing.
+- `org.sikuli.script.Location belowAt()` — missing.
+- `org.sikuli.script.Location belowAt(int)` — missing.
+- `org.sikuli.script.Location checkMatch()` — missing.
+- `org.sikuli.script.Location getBottomLeft()` — missing.
+- `org.sikuli.script.Location getBottomRight()` — missing.
+- `org.sikuli.script.Location getCenter()` — missing.
+- `org.sikuli.script.Location getTarget()` — missing.
+- `org.sikuli.script.Location getTopLeft()` — missing.
+- `org.sikuli.script.Location getTopRight()` — missing.
+- `org.sikuli.script.Location leftAt()` — missing.
+- `org.sikuli.script.Location leftAt(int)` — missing.
+- `org.sikuli.script.Location rightAt()` — missing.
+- `org.sikuli.script.Location rightAt(int)` — missing.
+- `org.sikuli.script.Match existsT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findLine(java.lang.String)` — missing.
+- `org.sikuli.script.Match findT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findWord(java.lang.String)` — missing.
+- `org.sikuli.script.Match getLastMatch()` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match findBest(java.lang.Object[])` — missing.
+- `org.sikuli.script.Match findBestList(java.util.List)` — missing.
+- `org.sikuli.script.Match findText(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitBest(double, java.lang.Object[])` — missing.
+- `org.sikuli.script.Match waitBestList(double, java.util.List)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String, double)` — missing.
+- `org.sikuli.script.ObserveEvent getEvent(java.lang.String)` — missing.
+- `org.sikuli.script.ObserveEvent[] getEvents()` — missing.
+- `org.sikuli.script.Region newRegion(int, int, int, int)` — missing.
+- `org.sikuli.script.Region newRegion(org.sikuli.script.Location, int, int)` — missing.
+- `org.sikuli.script.Region newRegion(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region set(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region setOther(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region above()` — missing.
+- `org.sikuli.script.Region above(int)` — missing.
+- `org.sikuli.script.Region add(int, int, int, int)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region below()` — missing.
+- `org.sikuli.script.Region below(int)` — missing.
+- `org.sikuli.script.Region copyTo(int)` — missing.
+- `org.sikuli.script.Region copyTo(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region get(int)` — missing.
+- `org.sikuli.script.Region getCell(int, int)` — missing.
+- `org.sikuli.script.Region getCol(int)` — missing.
+- `org.sikuli.script.Region getCol(int, int)` — missing.
+- `org.sikuli.script.Region getInset(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region getROI()` — missing.
+- `org.sikuli.script.Region getRow(int)` — missing.
+- `org.sikuli.script.Region getRow(int, int)` — missing.
+- `org.sikuli.script.Region grow()` — missing.
+- `org.sikuli.script.Region grow(int)` — missing.
+- `org.sikuli.script.Region grow(int, int)` — missing.
+- `org.sikuli.script.Region grow(int, int, int, int)` — missing.
+- `org.sikuli.script.Region highlight()` — missing.
+- `org.sikuli.script.Region highlight(double)` — missing.
+- `org.sikuli.script.Region highlight(double, java.lang.String)` — missing.
+- `org.sikuli.script.Region highlight(java.lang.String)` — missing.
+- `org.sikuli.script.Region highlight4py(java.util.ArrayList)` — missing.
+- `org.sikuli.script.Region highlightOff()` — missing.
+- `org.sikuli.script.Region highlightOn()` — missing.
+- `org.sikuli.script.Region highlightOn(java.lang.String)` — missing.
+- `org.sikuli.script.Region inside()` — missing.
+- `org.sikuli.script.Region intersection(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region left()` — missing.
+- `org.sikuli.script.Region left(int)` — missing.
+- `org.sikuli.script.Region morphTo(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region moveTo(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region nearby()` — missing.
+- `org.sikuli.script.Region nearby(int)` — missing.
+- `org.sikuli.script.Region offset(int, int)` — missing.
+- `org.sikuli.script.Region offset(java.lang.Object)` — missing.
+- `org.sikuli.script.Region right()` — missing.
+- `org.sikuli.script.Region right(int)` — missing.
+- `org.sikuli.script.Region setBottomLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setBottomRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCenter(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCols(int)` — missing.
+- `org.sikuli.script.Region setH(int)` — missing.
+- `org.sikuli.script.Region setLocation(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setOtherScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region setRaster(int, int)` — missing.
+- `org.sikuli.script.Region setRect(int, int, int, int)` — missing.
+- `org.sikuli.script.Region setRect(java.awt.Rectangle)` — missing.
+- `org.sikuli.script.Region setRect(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region setRows(int)` — missing.
+- `org.sikuli.script.Region setSize(int, int)` — missing.
+- `org.sikuli.script.Region setTopLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setTopRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setW(int)` — missing.
+- `org.sikuli.script.Region setX(int)` — missing.
+- `org.sikuli.script.Region setY(int)` — missing.
+- `org.sikuli.script.Region union(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region unionAny(java.lang.Object[])` — missing.
+- `org.sikuli.script.Region unionAnyList(java.util.List)` — missing.
+- `org.sikuli.script.ScreenImage capture()` — missing.
+- `org.sikuli.script.ScreenImage capture(int, int, int, int)` — missing.
+- `org.sikuli.script.ScreenImage capture(java.awt.Rectangle)` — missing.
+- `org.sikuli.script.ScreenImage capture(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.ScreenImage getLastScreenImageFromScreen()` — missing.
+- `org.sikuli.script.ScreenImage userCapture(java.lang.String)` — missing.
+- `org.sikuli.script.ScreenImage getLastScreenImage()` — missing.
+- `org.sikuli.support.Observer getObserver()` — missing.
+- `org.sikuli.support.devices.IRobot getRobot()` — missing.
+- `org.sikuli.support.devices.IScreen getScreen()` — missing.
+- `org.sikuli.support.devices.IScreen getScreenContaining()` — missing.
+- `static org.sikuli.script.Image getImageFromTarget(java.lang.Object)` — missing.
+- `static java.awt.image.BufferedImage getBufferedImage(java.lang.Object)` — missing.
+- `static org.sikuli.android.ADBScreen startBySerial(java.lang.String)` — missing.
+- `static org.sikuli.script.Location atMouse()` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int, org.sikuli.support.devices.IScreen)` — missing.
+- `static org.sikuli.script.Region create(java.awt.Rectangle)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Region)` — missing.
+- `static org.sikuli.script.Region getDefaultInstance4py()` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region make4py(java.util.ArrayList)` — missing.
+- `static org.sikuli.script.Region virtual(java.awt.Rectangle)` — missing.
+- `static void stop()` — missing.
+- `static void highlightAllOff()` — missing.
+- `void update(org.sikuli.util.EventSubject)` — missing.
+- `void waitAfterAction()` — missing.
+- `void setName(java.lang.String)` — missing.
+- `void aInput(java.lang.String)` — missing.
+- `void aKey(int)` — missing.
+- `void aSwipeDown()` — missing.
+- `void aSwipeLeft()` — missing.
+- `void aSwipeRight()` — missing.
+- `void aSwipeUp()` — missing.
+- `void delayClick(int)` — missing.
+- `void delayType(int)` — missing.
+- `void initScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `void internalUseOnlyHighlightReset()` — missing.
+- `void keyDown(int)` — missing.
+- `void keyDown(java.lang.String)` — missing.
+- `void keyUp()` — missing.
+- `void keyUp(int)` — missing.
+- `void keyUp(java.lang.String)` — missing.
+- `void mouseDown(int)` — missing.
+- `void mouseUp()` — missing.
+- `void mouseUp(int)` — missing.
+- `void resetFindFailedResponse()` — missing.
+- `void resetScreen()` — missing.
+- `void resetThrowException()` — missing.
+- `void saveLastScreenImage()` — missing.
+- `void setActive(java.lang.String)` — missing.
+- `void setAutoWaitTimeout(double)` — missing.
+- `void setFindFailedHandler(java.lang.Object)` — missing.
+- `void setFindFailedResponse(org.sikuli.script.FindFailedResponse)` — missing.
+- `void setInactive(java.lang.String)` — missing.
+- `void setObserveScanRate(float)` — missing.
+- `void setOtherScreen()` — missing.
+- `void setROI()` — missing.
+- `void setROI(int, int, int, int)` — missing.
+- `void setROI(java.awt.Rectangle)` — missing.
+- `void setROI(org.sikuli.script.Region)` — missing.
+- `void setRepeatWaitTime(int)` — missing.
+- `void setThrowException(boolean)` — missing.
+- `void setVirtual(boolean)` — missing.
+- `void setWaitScanRate(float)` — missing.
+- `void showScreens()` — missing.
+- `void stopObserver()` — missing.
+- `void stopObserver(java.lang.String)` — missing.
+- `void wait(double)` — missing.
+
+### `org.sikuli.script.App`
+
+- `boolean close(int)` — arity_mismatch.
+- `boolean hasFocus()` — missing.
+- `boolean isClosing()` — missing.
+- `boolean isRunning(int)` — arity_mismatch.
+- `boolean isUserProcess()` — missing.
+- `boolean isValid()` — missing.
+- `boolean maximize()` — missing.
+- `boolean minimize()` — missing.
+- `boolean open()` — static_mismatch.
+- `boolean open(int)` — static_mismatch.
+- `boolean restore()` — missing.
+- `boolean setWorkDir()` — missing.
+- `boolean setWorkDir(java.lang.String)` — missing.
+- `int closeByKey()` — missing.
+- `int closeByKey(int)` — missing.
+- `java.lang.String getArguments()` — missing.
+- `java.lang.String getExecutable()` — missing.
+- `java.lang.String getOptions()` — missing.
+- `java.lang.String getTitle()` — missing.
+- `java.lang.String getTitle(int)` — missing.
+- `java.lang.String getWindowTitle()` — missing.
+- `java.lang.String getWindowTitle(int)` — missing.
+- `java.lang.String getWorkDir()` — missing.
+- `java.lang.String toString()` — missing.
+- `java.util.List getWindows()` — missing.
+- `org.sikuli.script.App setArguments(java.lang.String)` — missing.
+- `org.sikuli.script.App setArguments(java.lang.String[])` — missing.
+- `org.sikuli.script.App setUsing(java.lang.String)` — missing.
+- `org.sikuli.script.Region window(int)` — arity_mismatch.
+- `static boolean close(java.lang.String)` — static_mismatch.
+- `static int run(java.lang.String)` — missing.
+- `static java.lang.String getClipboard()` — missing.
+- `static java.util.List getApps()` — missing.
+- `static java.util.List getApps(java.lang.String)` — missing.
+- `static org.sikuli.script.App focus(java.lang.String)` — static_mismatch.
+- `static org.sikuli.script.App focus(java.lang.String, int)` — static_mismatch.
+- `static org.sikuli.script.App getApp()` — missing.
+- `static org.sikuli.script.App open(java.lang.String, int)` — arity_mismatch.
+- `static org.sikuli.script.Region focusedWindow()` — missing.
+- `static void listApps()` — missing.
+- `static void listApps(java.lang.String)` — missing.
+- `static void log(java.lang.String, java.lang.Object[])` — missing.
+- `static void logOff()` — missing.
+- `static void logOn()` — missing.
+- `static void pause(float)` — missing.
+- `static void pause(int)` — missing.
+- `static void setClipboard(java.lang.String)` — missing.
+- `void reset()` — missing.
+- `void setName(java.lang.String)` — missing.
+
+### `org.sikuli.script.Image`
+
+- `org.sikuli.script.Match find(java.lang.Object)` — missing.
+- `boolean hasT(java.lang.String)` — missing.
+- `boolean hasText(java.lang.String)` — missing.
+- `boolean backup()` — missing.
+- `boolean hasIOException()` — missing.
+- `boolean isAbsolute()` — missing.
+- `boolean isBundled()` — missing.
+- `boolean isFile()` — missing.
+- `boolean isPattern()` — missing.
+- `boolean isRecaptured()` — missing.
+- `boolean isText()` — missing.
+- `boolean isUseable()` — missing.
+- `boolean isValid()` — missing.
+- `boolean restore()` — missing.
+- `double getLastSeenScore()` — missing.
+- `double getSimilarity()` — missing.
+- `int getH()` — missing.
+- `int getW()` — missing.
+- `int getX()` — missing.
+- `int getY()` — missing.
+- `int getCaptureDpi()` — missing.
+- `int getColW()` — missing.
+- `int getCols()` — missing.
+- `int getRowH()` — missing.
+- `int getRows()` — missing.
+- `int getWaitAfter()` — missing.
+- `java.awt.Dimension getSize()` — missing.
+- `java.awt.Rectangle getLastSeen()` — missing.
+- `java.awt.image.BufferedImage get()` — missing.
+- `java.awt.image.BufferedImage resize(float)` — missing.
+- `java.awt.image.BufferedImage resize(float, org.sikuli.support.Commons$Interpolation)` — missing.
+- `java.io.File file()` — missing.
+- `java.io.File remove()` — missing.
+- `java.lang.String fileName()` — missing.
+- `java.lang.String getName()` — missing.
+- `java.lang.String text()` — missing.
+- `java.lang.String textChar()` — missing.
+- `java.lang.String textLine()` — missing.
+- `java.lang.String textWord()` — missing.
+- `java.lang.String getFilename()` — missing.
+- `java.lang.String getNameGiven()` — missing.
+- `java.lang.String save(java.lang.String)` — missing.
+- `java.lang.String save(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String toString()` — missing.
+- `java.net.URL getURL()` — missing.
+- `java.util.Iterator getLastMatches()` — missing.
+- `java.util.List collectLinesText()` — missing.
+- `java.util.List collectWordsText()` — missing.
+- `java.util.List textLines()` — missing.
+- `java.util.List textWords()` — missing.
+- `java.util.List collectLines()` — missing.
+- `java.util.List collectWords()` — missing.
+- `java.util.List findAllT(java.lang.String)` — missing.
+- `java.util.List findAllText(java.lang.String)` — missing.
+- `java.util.List findLines()` — missing.
+- `java.util.List findLines(java.lang.String)` — missing.
+- `java.util.List findWords()` — missing.
+- `java.util.List findWords(java.lang.String)` — missing.
+- `org.sikuli.script.Image getCell(int, int)` — missing.
+- `org.sikuli.script.Image getCol(int)` — missing.
+- `org.sikuli.script.Image getRow(int)` — missing.
+- `org.sikuli.script.Image getSub(int)` — missing.
+- `org.sikuli.script.Image getSub(int, int, int, int)` — missing.
+- `org.sikuli.script.Image getSub(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Image setBimg(java.awt.image.BufferedImage)` — missing.
+- `org.sikuli.script.Image setCols(int)` — missing.
+- `org.sikuli.script.Image setFileURL(java.net.URL)` — missing.
+- `org.sikuli.script.Image setIsAbsolute(boolean)` — missing.
+- `org.sikuli.script.Image setIsPattern(boolean)` — missing.
+- `org.sikuli.script.Image setIsText(boolean)` — missing.
+- `org.sikuli.script.Image setLastSeen(java.awt.Rectangle, double)` — missing.
+- `org.sikuli.script.Image setLastSeenAndPersist(java.awt.Rectangle, double)` — missing.
+- `org.sikuli.script.Image setOffset(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Image setRaster(int, int)` — missing.
+- `org.sikuli.script.Image setRows(int)` — missing.
+- `org.sikuli.script.Image setSimilarity(double)` — missing.
+- `org.sikuli.script.Image setWaitAfter(int)` — missing.
+- `org.sikuli.script.Location getOffset()` — missing.
+- `org.sikuli.script.Match existsT(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String)` — missing.
+- `org.sikuli.script.Match findLine(java.lang.String)` — missing.
+- `org.sikuli.script.Match findT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findText(java.lang.String)` — missing.
+- `org.sikuli.script.Match findWord(java.lang.String)` — missing.
+- `org.sikuli.script.Match getLastMatch()` — missing.
+- `static org.sikuli.script.Image getImageFromTarget(java.lang.Object)` — missing.
+- `static java.awt.image.BufferedImage getBufferedImage(java.lang.Object)` — missing.
+- `static boolean getIDEshouldReload()` — missing.
+- `static boolean isValidImageFilename(java.lang.String)` — missing.
+- `static java.awt.image.BufferedImage createSubimage(java.awt.image.BufferedImage, java.awt.Rectangle)` — missing.
+- `static java.awt.image.BufferedImage getSubimage(java.awt.image.BufferedImage, java.awt.Rectangle)` — missing.
+- `static java.lang.String getValidImageFilename(java.lang.String)` — missing.
+- `static java.lang.String text(java.lang.String)` — missing.
+- `static java.lang.String textChar(java.lang.String)` — missing.
+- `static java.lang.String textLine(java.lang.String)` — missing.
+- `static java.lang.String textWord(java.lang.String)` — missing.
+- `static org.sikuli.script.Image create(java.io.File)` — missing.
+- `static org.sikuli.script.Image create(java.lang.String)` — missing.
+- `static org.sikuli.script.Image create(java.net.URL)` — missing.
+- `static org.sikuli.script.Image create(org.sikuli.script.Image)` — missing.
+- `static org.sikuli.script.Image create(org.sikuli.script.Pattern)` — missing.
+- `static org.sikuli.script.Image createSilent(java.lang.String)` — missing.
+- `static org.sikuli.script.Image createThumbNail(java.lang.String)` — missing.
+- `static org.sikuli.script.Image getDefaultInstance4py()` — missing.
+- `static void clearCache(int)` — missing.
+- `static void dump()` — missing.
+- `static void dump(int)` — missing.
+- `static void purge()` — missing.
+- `static void purge(org.sikuli.script.ImagePath$PathEntry)` — missing.
+- `static void reinit(org.sikuli.script.Image)` — missing.
+- `static void reload(java.lang.String)` — missing.
+- `static void reset()` — missing.
+- `static void setIDEshouldReload(org.sikuli.script.Image)` — missing.
+- `static void unCache(java.lang.String)` — missing.
+- `void setName(java.lang.String)` — missing.
+- `void delete()` — missing.
+- `void save(java.io.File)` — missing.
+- `void setCaptureDpi(int)` — missing.
+- `void setHasIOException(boolean)` — missing.
+
+### `org.sikuli.script.Location`
+
+- `boolean equals(java.lang.Object)` — missing.
+- `boolean isOtherScreen()` — missing.
+- `int compareTo(org.sikuli.script.Location)` — missing.
+- `int hashCode()` — missing.
+- `java.awt.Color getColor()` — missing.
+- `java.awt.Point getPoint()` — missing.
+- `java.lang.String toJSON()` — missing.
+- `java.lang.String toString()` — missing.
+- `java.lang.String toStringShort()` — missing.
+- `org.sikuli.script.Location above(int)` — missing.
+- `org.sikuli.script.Location below(int)` — missing.
+- `org.sikuli.script.Location click()` — missing.
+- `org.sikuli.script.Location copyTo(int)` — missing.
+- `org.sikuli.script.Location copyTo(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Location doubleClick()` — missing.
+- `org.sikuli.script.Location hover()` — missing.
+- `org.sikuli.script.Location left(int)` — missing.
+- `org.sikuli.script.Location move(int, int)` — missing.
+- `org.sikuli.script.Location moveFor(int, int)` — missing.
+- `org.sikuli.script.Location moveTo(int, int)` — missing.
+- `org.sikuli.script.Location offset(int, int)` — missing.
+- `org.sikuli.script.Location offset(java.lang.Object)` — missing.
+- `org.sikuli.script.Location right(int)` — missing.
+- `org.sikuli.script.Location rightClick()` — missing.
+- `org.sikuli.script.Location set(double, double)` — missing.
+- `org.sikuli.script.Location set(int, int)` — missing.
+- `org.sikuli.script.Location setOtherScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Location setX(double)` — missing.
+- `org.sikuli.script.Location setX(int)` — missing.
+- `org.sikuli.script.Location setY(double)` — missing.
+- `org.sikuli.script.Location setY(int)` — missing.
+- `org.sikuli.script.Location translate(int, int)` — missing.
+- `org.sikuli.script.Offset getOffset(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region grow()` — missing.
+- `org.sikuli.script.Region grow(int)` — missing.
+- `org.sikuli.script.Region grow(int, int)` — missing.
+- `org.sikuli.script.Region grow(int, int, int, int)` — missing.
+- `org.sikuli.script.Region union(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Screen getMonitor()` — missing.
+- `org.sikuli.support.devices.IScreen getScreen()` — missing.
+- `static org.sikuli.script.Location getDefaultInstance4py()` — missing.
+- `static org.sikuli.script.Location make4py(java.util.ArrayList)` — missing.
+
+### `org.sikuli.script.Match`
+
+- `int click(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int doubleClick(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int drag(java.lang.Object)` — missing.
+- `int dragDrop(java.lang.Object)` — arity_mismatch.
+- `int dropAt(java.lang.Object)` — missing.
+- `int paste(java.lang.Object, java.lang.String)` — arity_mismatch.
+- `int rightClick(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(java.lang.Object, int, int)` — missing.
+- `int wheel(java.lang.Object, int, int, int)` — missing.
+- `void aSwipe(java.lang.Object, java.lang.Object)` — missing.
+- `void aTap(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object, double)` — missing.
+- `java.lang.String onAppear(java.lang.Object)` — missing.
+- `java.lang.String onAppear(java.lang.Object, java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object, java.lang.Object)` — missing.
+- `java.util.List findAllByColumn(java.lang.Object)` — missing.
+- `java.util.List findAllByRow(java.lang.Object)` — missing.
+- `java.util.List findAllList(java.lang.Object)` — missing.
+- `java.util.List getAll(java.lang.Object)` — missing.
+- `org.sikuli.script.Region unionAll(java.lang.Object)` — missing.
+- `boolean hasT(java.lang.String)` — missing.
+- `boolean equals(java.lang.Object)` — missing.
+- `boolean containsMouse()` — missing.
+- `boolean getThrowException()` — missing.
+- `boolean hasEvents()` — missing.
+- `boolean hasObserver()` — missing.
+- `boolean hasText(java.lang.String)` — missing.
+- `boolean isObserving()` — missing.
+- `boolean isOtherScreen()` — missing.
+- `boolean isRasterValid()` — missing.
+- `boolean isValid()` — missing.
+- `boolean isVirtual()` — missing.
+- `boolean observe()` — missing.
+- `boolean observe(double)` — missing.
+- `boolean observeInBackground()` — missing.
+- `boolean observeInBackground(double)` — missing.
+- `boolean observeInLine(double)` — missing.
+- `boolean waitForStable()` — missing.
+- `boolean waitForStable(long, long)` — missing.
+- `boolean waitForStable(long, long, double)` — missing.
+- `double getAutoWaitTimeout()` — missing.
+- `float getObserveScanRate()` — missing.
+- `float getWaitScanRate()` — missing.
+- `int compareTo(org.sikuli.script.Match)` — missing.
+- `int hashCode()` — missing.
+- `int getColW()` — missing.
+- `int getCols()` — missing.
+- `int getRepeatWaitTime()` — missing.
+- `int getRowH()` — missing.
+- `int getRows()` — missing.
+- `int mouseMove(int, int)` — arity_mismatch.
+- `int type(java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(int, int)` — missing.
+- `java.awt.Rectangle getRect()` — missing.
+- `java.io.File file()` — missing.
+- `java.lang.String fileName()` — missing.
+- `java.lang.String getName()` — missing.
+- `java.lang.String textChar()` — missing.
+- `java.lang.String textLine()` — missing.
+- `java.lang.String textWord()` — missing.
+- `java.lang.String getImageFilename()` — missing.
+- `java.lang.String getText()` — missing.
+- `java.lang.String toString()` — missing.
+- `java.lang.String toStringShort()` — missing.
+- `java.lang.String getLastScreenImageFile()` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String)` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String onChange()` — missing.
+- `java.lang.String onChange(java.lang.Integer)` — missing.
+- `java.lang.String onChange(java.lang.Integer, java.lang.Object)` — missing.
+- `java.lang.String onChange(java.lang.Object)` — missing.
+- `java.lang.String saveCapture(java.lang.Object[])` — missing.
+- `java.util.Iterator getLastMatches()` — missing.
+- `java.util.List collectLinesText()` — missing.
+- `java.util.List collectWordsText()` — missing.
+- `java.util.List collectLines()` — missing.
+- `java.util.List collectWords()` — missing.
+- `java.util.List findAllT(java.lang.String)` — missing.
+- `java.util.List findLines()` — missing.
+- `java.util.List findLines(java.lang.String)` — missing.
+- `java.util.List findWords()` — missing.
+- `java.util.List findWords(java.lang.String)` — missing.
+- `java.util.List findAllText(java.lang.String)` — missing.
+- `java.util.List findAny(java.lang.Object[])` — missing.
+- `java.util.List findAnyList(java.util.List)` — missing.
+- `java.util.List waitAny(double, java.lang.Object[])` — missing.
+- `java.util.List waitAnyList(double, java.util.List)` — missing.
+- `long getTime()` — missing.
+- `org.sikuli.script.FindFailedResponse getFindFailedResponse()` — missing.
+- `org.sikuli.script.Image getImage()` — missing.
+- `org.sikuli.script.Location getTargetOffset()` — missing.
+- `org.sikuli.script.Location aboveAt()` — missing.
+- `org.sikuli.script.Location aboveAt(int)` — missing.
+- `org.sikuli.script.Location asOffset()` — missing.
+- `org.sikuli.script.Location belowAt()` — missing.
+- `org.sikuli.script.Location belowAt(int)` — missing.
+- `org.sikuli.script.Location checkMatch()` — missing.
+- `org.sikuli.script.Location getBottomLeft()` — missing.
+- `org.sikuli.script.Location getBottomRight()` — missing.
+- `org.sikuli.script.Location getCenter()` — missing.
+- `org.sikuli.script.Location getTopLeft()` — missing.
+- `org.sikuli.script.Location getTopRight()` — missing.
+- `org.sikuli.script.Location leftAt()` — missing.
+- `org.sikuli.script.Location leftAt(int)` — missing.
+- `org.sikuli.script.Location rightAt()` — missing.
+- `org.sikuli.script.Location rightAt(int)` — missing.
+- `org.sikuli.script.Match existsT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findLine(java.lang.String)` — missing.
+- `org.sikuli.script.Match findT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findWord(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match findBest(java.lang.Object[])` — missing.
+- `org.sikuli.script.Match findBestList(java.util.List)` — missing.
+- `org.sikuli.script.Match waitBest(double, java.lang.Object[])` — missing.
+- `org.sikuli.script.Match waitBestList(double, java.util.List)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String, double)` — missing.
+- `org.sikuli.script.ObserveEvent getEvent(java.lang.String)` — missing.
+- `org.sikuli.script.ObserveEvent[] getEvents()` — missing.
+- `org.sikuli.script.Region add(int, int, int, int)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region copyTo(int)` — missing.
+- `org.sikuli.script.Region copyTo(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region get(int)` — missing.
+- `org.sikuli.script.Region getCell(int, int)` — missing.
+- `org.sikuli.script.Region getCol(int)` — missing.
+- `org.sikuli.script.Region getCol(int, int)` — missing.
+- `org.sikuli.script.Region getInset(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region getROI()` — missing.
+- `org.sikuli.script.Region getRow(int)` — missing.
+- `org.sikuli.script.Region getRow(int, int)` — missing.
+- `org.sikuli.script.Region grow()` — missing.
+- `org.sikuli.script.Region grow(int)` — missing.
+- `org.sikuli.script.Region grow(int, int)` — missing.
+- `org.sikuli.script.Region grow(int, int, int, int)` — missing.
+- `org.sikuli.script.Region highlight(double, java.lang.String)` — arity_mismatch.
+- `org.sikuli.script.Region highlight4py(java.util.ArrayList)` — missing.
+- `org.sikuli.script.Region highlightOff()` — missing.
+- `org.sikuli.script.Region highlightOn()` — missing.
+- `org.sikuli.script.Region highlightOn(java.lang.String)` — missing.
+- `org.sikuli.script.Region inside()` — missing.
+- `org.sikuli.script.Region intersection(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region morphTo(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region moveTo(org.sikuli.script.Location)` — arity_mismatch.
+- `org.sikuli.script.Region offset(int, int)` — missing.
+- `org.sikuli.script.Region offset(java.lang.Object)` — missing.
+- `org.sikuli.script.Region setBottomLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setBottomRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCenter(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCols(int)` — missing.
+- `org.sikuli.script.Region setLocation(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setOtherScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region setRaster(int, int)` — missing.
+- `org.sikuli.script.Region setRect(int, int, int, int)` — missing.
+- `org.sikuli.script.Region setRect(java.awt.Rectangle)` — missing.
+- `org.sikuli.script.Region setRect(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region setRows(int)` — missing.
+- `org.sikuli.script.Region setSize(int, int)` — missing.
+- `org.sikuli.script.Region setTopLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setTopRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region union(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region unionAny(java.lang.Object[])` — missing.
+- `org.sikuli.script.Region unionAnyList(java.util.List)` — missing.
+- `org.sikuli.script.ScreenImage getLastScreenImage()` — missing.
+- `org.sikuli.support.Observer getObserver()` — missing.
+- `org.sikuli.support.devices.IScreen getScreen()` — missing.
+- `org.sikuli.support.devices.IScreen getScreenContaining()` — missing.
+- `static org.sikuli.script.Image getImageFromTarget(java.lang.Object)` — missing.
+- `static java.awt.image.BufferedImage getBufferedImage(java.lang.Object)` — missing.
+- `static org.sikuli.script.Location atMouse()` — missing.
+- `static org.sikuli.script.Match create(org.sikuli.script.Match, org.sikuli.support.devices.IScreen)` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int, org.sikuli.support.devices.IScreen)` — missing.
+- `static org.sikuli.script.Region create(java.awt.Rectangle)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Region)` — missing.
+- `static org.sikuli.script.Region getDefaultInstance4py()` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region make4py(java.util.ArrayList)` — missing.
+- `static org.sikuli.script.Region virtual(java.awt.Rectangle)` — missing.
+- `static void highlightAllOff()` — missing.
+- `void setName(java.lang.String)` — missing.
+- `void setIndex(int)` — missing.
+- `void setOnScreen(boolean)` — missing.
+- `void setTarget(int, int)` — missing.
+- `void setTargetOffset(int, int)` — missing.
+- `void setTargetOffset(org.sikuli.script.Location)` — missing.
+- `void setTimes(long, long)` — missing.
+- `void aInput(java.lang.String)` — missing.
+- `void aKey(int)` — missing.
+- `void aSwipeDown()` — missing.
+- `void aSwipeLeft()` — missing.
+- `void aSwipeRight()` — missing.
+- `void aSwipeUp()` — missing.
+- `void delayClick(int)` — missing.
+- `void delayType(int)` — missing.
+- `void initScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `void internalUseOnlyHighlightReset()` — missing.
+- `void resetFindFailedResponse()` — missing.
+- `void resetScreen()` — missing.
+- `void resetThrowException()` — missing.
+- `void saveLastScreenImage()` — missing.
+- `void setActive(java.lang.String)` — missing.
+- `void setAutoWaitTimeout(double)` — missing.
+- `void setFindFailedHandler(java.lang.Object)` — missing.
+- `void setFindFailedResponse(org.sikuli.script.FindFailedResponse)` — missing.
+- `void setInactive(java.lang.String)` — missing.
+- `void setObserveScanRate(float)` — missing.
+- `void setOtherScreen()` — missing.
+- `void setROI()` — arity_mismatch.
+- `void setROI(java.awt.Rectangle)` — arity_mismatch.
+- `void setROI(org.sikuli.script.Region)` — arity_mismatch.
+- `void setRepeatWaitTime(int)` — missing.
+- `void setThrowException(boolean)` — missing.
+- `void setVirtual(boolean)` — missing.
+- `void setWaitScanRate(float)` — missing.
+- `void showScreens()` — missing.
+- `void stopObserver()` — missing.
+- `void stopObserver(java.lang.String)` — missing.
+
+### `org.sikuli.script.OCR`
+
+- `static java.lang.String readChar(java.lang.Object)` — missing.
+- `static java.lang.String readChar(java.lang.Object, org.sikuli.script.OCR$Options)` — missing.
+- `static java.lang.String readLine(java.lang.Object, org.sikuli.script.OCR$Options)` — arity_mismatch.
+- `static java.lang.String readWord(java.lang.Object, org.sikuli.script.OCR$Options)` — arity_mismatch.
+- `static java.util.List readLines(java.lang.Object, org.sikuli.script.OCR$Options)` — arity_mismatch.
+- `static java.util.List readWords(java.lang.Object, org.sikuli.script.OCR$Options)` — arity_mismatch.
+- `static java.util.List availableLanguages()` — missing.
+- `static org.sikuli.script.OCR$Options reset()` — missing.
+- `static void status()` — missing.
+
+### `org.sikuli.script.OCR$Options`
+
+- `boolean isLightFont()` — missing.
+- `float largeImageFactor()` — missing.
+- `float textHeight()` — missing.
+- `int oem()` — missing.
+- `int psm()` — missing.
+- `java.lang.String dataPath()` — missing.
+- `java.lang.String language()` — missing.
+- `java.lang.String toString()` — missing.
+- `java.util.List configs()` — missing.
+- `java.util.Map variables()` — missing.
+- `org.sikuli.script.OCR$Options asChar()` — missing.
+- `org.sikuli.script.OCR$Options asLine()` — missing.
+- `org.sikuli.script.OCR$Options asWord()` — missing.
+- `org.sikuli.script.OCR$Options bestDPI(int)` — missing.
+- `org.sikuli.script.OCR$Options clone()` — missing.
+- `org.sikuli.script.OCR$Options configs(java.lang.String[])` — missing.
+- `org.sikuli.script.OCR$Options configs(java.util.List)` — missing.
+- `org.sikuli.script.OCR$Options dataPath(java.lang.String)` — missing.
+- `org.sikuli.script.OCR$Options fontSize(int)` — missing.
+- `org.sikuli.script.OCR$Options language(java.lang.String)` — missing.
+- `org.sikuli.script.OCR$Options largeImageFactor(float)` — missing.
+- `org.sikuli.script.OCR$Options lightFont()` — missing.
+- `org.sikuli.script.OCR$Options oem(int)` — missing.
+- `org.sikuli.script.OCR$Options oem(org.sikuli.script.OCR$OEM)` — missing.
+- `org.sikuli.script.OCR$Options psm(int)` — missing.
+- `org.sikuli.script.OCR$Options psm(org.sikuli.script.OCR$PSM)` — missing.
+- `org.sikuli.script.OCR$Options reset()` — missing.
+- `org.sikuli.script.OCR$Options resetPSM()` — missing.
+- `org.sikuli.script.OCR$Options resizeInterpolation(org.sikuli.support.Commons$Interpolation)` — missing.
+- `org.sikuli.script.OCR$Options smallFont()` — missing.
+- `org.sikuli.script.OCR$Options textHeight(float)` — missing.
+- `org.sikuli.script.OCR$Options userDPI(int)` — missing.
+- `org.sikuli.script.OCR$Options variable(java.lang.String, java.lang.String)` — missing.
+
+### `org.sikuli.script.Pattern`
+
+- `boolean hasMask()` — missing.
+- `boolean isImagePattern()` — missing.
+- `boolean isValid()` — missing.
+- `double getSimilar()` — missing.
+- `float getResize()` — missing.
+- `int getTimeAfter()` — missing.
+- `java.awt.image.BufferedImage getBImage()` — missing.
+- `java.lang.String getFilename()` — missing.
+- `java.lang.String toString()` — missing.
+- `java.net.URL getFileURL()` — missing.
+- `org.opencv.core.Mat getMask()` — missing.
+- `org.sikuli.script.Image getImage()` — missing.
+- `org.sikuli.script.Location getTargetOffset()` — missing.
+- `org.sikuli.script.Pattern asMask()` — missing.
+- `org.sikuli.script.Pattern mask()` — missing.
+- `org.sikuli.script.Pattern mask(java.lang.String)` — missing.
+- `org.sikuli.script.Pattern mask(org.sikuli.script.Image)` — missing.
+- `org.sikuli.script.Pattern mask(org.sikuli.script.Pattern)` — missing.
+- `org.sikuli.script.Pattern resize(float)` — missing.
+- `org.sikuli.script.Pattern setBImage(java.awt.image.BufferedImage)` — missing.
+- `org.sikuli.script.Pattern setFilename(java.lang.String)` — missing.
+- `org.sikuli.script.Pattern setFilename(java.net.URL)` — missing.
+- `org.sikuli.script.Pattern setFilename(org.sikuli.script.Image)` — missing.
+- `org.sikuli.script.Pattern setImage(org.sikuli.script.Image)` — missing.
+- `org.sikuli.script.Pattern targetOffset(org.sikuli.script.Location)` — arity_mismatch.
+- `org.sikuli.script.Pattern withMask()` — missing.
+- `org.sikuli.script.Pattern withMask(org.sikuli.script.Pattern)` — missing.
+- `static org.sikuli.script.Pattern fromLocator(java.lang.String)` — missing.
+- `static org.sikuli.script.Pattern make(org.sikuli.script.Image, double, org.sikuli.script.Location, float, java.lang.String)` — missing.
+- `void setMaskFromString(java.lang.String)` — missing.
+- `void setTimeAfter(int)` — missing.
+
+### `org.sikuli.script.Region`
+
+- `int click(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int doubleClick(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int drag(java.lang.Object)` — missing.
+- `int dragDrop(java.lang.Object)` — arity_mismatch.
+- `int dropAt(java.lang.Object)` — missing.
+- `int paste(java.lang.Object, java.lang.String)` — arity_mismatch.
+- `int rightClick(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(java.lang.Object, int, int)` — missing.
+- `int wheel(java.lang.Object, int, int, int)` — missing.
+- `void aSwipe(java.lang.Object, java.lang.Object)` — missing.
+- `void aTap(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object, double)` — missing.
+- `java.lang.String onAppear(java.lang.Object)` — missing.
+- `java.lang.String onAppear(java.lang.Object, java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object, java.lang.Object)` — missing.
+- `java.util.List findAllByColumn(java.lang.Object)` — missing.
+- `java.util.List findAllByRow(java.lang.Object)` — missing.
+- `java.util.List findAllList(java.lang.Object)` — missing.
+- `java.util.List getAll(java.lang.Object)` — missing.
+- `org.sikuli.script.Region unionAll(java.lang.Object)` — missing.
+- `boolean hasT(java.lang.String)` — missing.
+- `boolean containsMouse()` — missing.
+- `boolean getThrowException()` — missing.
+- `boolean hasEvents()` — missing.
+- `boolean hasObserver()` — missing.
+- `boolean hasText(java.lang.String)` — missing.
+- `boolean isObserving()` — missing.
+- `boolean isOtherScreen()` — missing.
+- `boolean isRasterValid()` — missing.
+- `boolean isValid()` — missing.
+- `boolean isVirtual()` — missing.
+- `boolean observe()` — missing.
+- `boolean observe(double)` — missing.
+- `boolean observeInBackground()` — missing.
+- `boolean observeInBackground(double)` — missing.
+- `boolean observeInLine(double)` — missing.
+- `boolean waitForStable()` — missing.
+- `boolean waitForStable(long, long)` — missing.
+- `boolean waitForStable(long, long, double)` — missing.
+- `double getAutoWaitTimeout()` — missing.
+- `float getObserveScanRate()` — missing.
+- `float getWaitScanRate()` — missing.
+- `int getColW()` — missing.
+- `int getCols()` — missing.
+- `int getRepeatWaitTime()` — missing.
+- `int getRowH()` — missing.
+- `int getRows()` — missing.
+- `int mouseMove(int, int)` — arity_mismatch.
+- `int type(java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(int, int)` — missing.
+- `java.awt.Rectangle getRect()` — missing.
+- `java.io.File file()` — missing.
+- `java.lang.String fileName()` — missing.
+- `java.lang.String getName()` — missing.
+- `java.lang.String textChar()` — missing.
+- `java.lang.String textLine()` — missing.
+- `java.lang.String textWord()` — missing.
+- `java.lang.String getLastScreenImageFile()` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String)` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String onChange()` — missing.
+- `java.lang.String onChange(java.lang.Integer)` — missing.
+- `java.lang.String onChange(java.lang.Integer, java.lang.Object)` — missing.
+- `java.lang.String onChange(java.lang.Object)` — missing.
+- `java.lang.String saveCapture(java.lang.Object[])` — missing.
+- `java.lang.String toString()` — missing.
+- `java.lang.String toStringShort()` — missing.
+- `java.util.Iterator getLastMatches()` — missing.
+- `java.util.List collectLinesText()` — missing.
+- `java.util.List collectWordsText()` — missing.
+- `java.util.List collectLines()` — missing.
+- `java.util.List collectWords()` — missing.
+- `java.util.List findAllT(java.lang.String)` — missing.
+- `java.util.List findLines()` — missing.
+- `java.util.List findLines(java.lang.String)` — missing.
+- `java.util.List findWords()` — missing.
+- `java.util.List findWords(java.lang.String)` — missing.
+- `java.util.List findAllText(java.lang.String)` — missing.
+- `java.util.List findAny(java.lang.Object[])` — missing.
+- `java.util.List findAnyList(java.util.List)` — missing.
+- `java.util.List waitAny(double, java.lang.Object[])` — missing.
+- `java.util.List waitAnyList(double, java.util.List)` — missing.
+- `org.sikuli.script.FindFailedResponse getFindFailedResponse()` — missing.
+- `org.sikuli.script.Image getImage()` — missing.
+- `org.sikuli.script.Location aboveAt()` — missing.
+- `org.sikuli.script.Location aboveAt(int)` — missing.
+- `org.sikuli.script.Location asOffset()` — missing.
+- `org.sikuli.script.Location belowAt()` — missing.
+- `org.sikuli.script.Location belowAt(int)` — missing.
+- `org.sikuli.script.Location checkMatch()` — missing.
+- `org.sikuli.script.Location getBottomLeft()` — missing.
+- `org.sikuli.script.Location getBottomRight()` — missing.
+- `org.sikuli.script.Location getCenter()` — missing.
+- `org.sikuli.script.Location getTarget()` — missing.
+- `org.sikuli.script.Location getTopLeft()` — missing.
+- `org.sikuli.script.Location getTopRight()` — missing.
+- `org.sikuli.script.Location leftAt()` — missing.
+- `org.sikuli.script.Location leftAt(int)` — missing.
+- `org.sikuli.script.Location rightAt()` — missing.
+- `org.sikuli.script.Location rightAt(int)` — missing.
+- `org.sikuli.script.Match existsT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findLine(java.lang.String)` — missing.
+- `org.sikuli.script.Match findT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findWord(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match findBest(java.lang.Object[])` — missing.
+- `org.sikuli.script.Match findBestList(java.util.List)` — missing.
+- `org.sikuli.script.Match waitBest(double, java.lang.Object[])` — missing.
+- `org.sikuli.script.Match waitBestList(double, java.util.List)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String, double)` — missing.
+- `org.sikuli.script.ObserveEvent getEvent(java.lang.String)` — missing.
+- `org.sikuli.script.ObserveEvent[] getEvents()` — missing.
+- `org.sikuli.script.Region add(int, int, int, int)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region copyTo(int)` — missing.
+- `org.sikuli.script.Region copyTo(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region get(int)` — missing.
+- `org.sikuli.script.Region getCell(int, int)` — missing.
+- `org.sikuli.script.Region getCol(int)` — missing.
+- `org.sikuli.script.Region getCol(int, int)` — missing.
+- `org.sikuli.script.Region getInset(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region getROI()` — missing.
+- `org.sikuli.script.Region getRow(int)` — missing.
+- `org.sikuli.script.Region getRow(int, int)` — missing.
+- `org.sikuli.script.Region grow()` — missing.
+- `org.sikuli.script.Region grow(int)` — missing.
+- `org.sikuli.script.Region grow(int, int)` — missing.
+- `org.sikuli.script.Region grow(int, int, int, int)` — missing.
+- `org.sikuli.script.Region highlight(double, java.lang.String)` — arity_mismatch.
+- `org.sikuli.script.Region highlight4py(java.util.ArrayList)` — missing.
+- `org.sikuli.script.Region highlightOff()` — missing.
+- `org.sikuli.script.Region highlightOn()` — missing.
+- `org.sikuli.script.Region highlightOn(java.lang.String)` — missing.
+- `org.sikuli.script.Region inside()` — missing.
+- `org.sikuli.script.Region intersection(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region morphTo(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region moveTo(org.sikuli.script.Location)` — arity_mismatch.
+- `org.sikuli.script.Region offset(int, int)` — missing.
+- `org.sikuli.script.Region offset(java.lang.Object)` — missing.
+- `org.sikuli.script.Region setBottomLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setBottomRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCenter(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCols(int)` — missing.
+- `org.sikuli.script.Region setLocation(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setOtherScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region setRaster(int, int)` — missing.
+- `org.sikuli.script.Region setRect(int, int, int, int)` — missing.
+- `org.sikuli.script.Region setRect(java.awt.Rectangle)` — missing.
+- `org.sikuli.script.Region setRect(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region setRows(int)` — missing.
+- `org.sikuli.script.Region setSize(int, int)` — missing.
+- `org.sikuli.script.Region setTopLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setTopRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region union(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region unionAny(java.lang.Object[])` — missing.
+- `org.sikuli.script.Region unionAnyList(java.util.List)` — missing.
+- `org.sikuli.script.ScreenImage getLastScreenImage()` — missing.
+- `org.sikuli.support.Observer getObserver()` — missing.
+- `org.sikuli.support.devices.IScreen getScreen()` — missing.
+- `org.sikuli.support.devices.IScreen getScreenContaining()` — missing.
+- `static org.sikuli.script.Image getImageFromTarget(java.lang.Object)` — missing.
+- `static java.awt.image.BufferedImage getBufferedImage(java.lang.Object)` — missing.
+- `static org.sikuli.script.Location atMouse()` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int, org.sikuli.support.devices.IScreen)` — missing.
+- `static org.sikuli.script.Region create(java.awt.Rectangle)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Region)` — missing.
+- `static org.sikuli.script.Region getDefaultInstance4py()` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region make4py(java.util.ArrayList)` — missing.
+- `static org.sikuli.script.Region virtual(java.awt.Rectangle)` — missing.
+- `static void highlightAllOff()` — missing.
+- `void setName(java.lang.String)` — missing.
+- `void aInput(java.lang.String)` — missing.
+- `void aKey(int)` — missing.
+- `void aSwipeDown()` — missing.
+- `void aSwipeLeft()` — missing.
+- `void aSwipeRight()` — missing.
+- `void aSwipeUp()` — missing.
+- `void delayClick(int)` — missing.
+- `void delayType(int)` — missing.
+- `void initScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `void internalUseOnlyHighlightReset()` — missing.
+- `void resetFindFailedResponse()` — missing.
+- `void resetScreen()` — missing.
+- `void resetThrowException()` — missing.
+- `void saveLastScreenImage()` — missing.
+- `void setActive(java.lang.String)` — missing.
+- `void setAutoWaitTimeout(double)` — missing.
+- `void setFindFailedHandler(java.lang.Object)` — missing.
+- `void setFindFailedResponse(org.sikuli.script.FindFailedResponse)` — missing.
+- `void setInactive(java.lang.String)` — missing.
+- `void setObserveScanRate(float)` — missing.
+- `void setOtherScreen()` — missing.
+- `void setROI()` — arity_mismatch.
+- `void setROI(java.awt.Rectangle)` — arity_mismatch.
+- `void setROI(org.sikuli.script.Region)` — arity_mismatch.
+- `void setRepeatWaitTime(int)` — missing.
+- `void setThrowException(boolean)` — missing.
+- `void setVirtual(boolean)` — missing.
+- `void setWaitScanRate(float)` — missing.
+- `void showScreens()` — missing.
+- `void stopObserver()` — missing.
+- `void stopObserver(java.lang.String)` — missing.
+
+### `org.sikuli.script.Screen`
+
+- `int click(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int doubleClick(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int drag(java.lang.Object)` — missing.
+- `int dragDrop(java.lang.Object)` — arity_mismatch.
+- `int dropAt(java.lang.Object)` — missing.
+- `int paste(java.lang.Object, java.lang.String)` — arity_mismatch.
+- `int rightClick(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(java.lang.Object, int, int)` — missing.
+- `int wheel(java.lang.Object, int, int, int)` — missing.
+- `void aSwipe(java.lang.Object, java.lang.Object)` — missing.
+- `void aTap(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object, double)` — missing.
+- `java.lang.String onAppear(java.lang.Object)` — missing.
+- `java.lang.String onAppear(java.lang.Object, java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object, java.lang.Object)` — missing.
+- `java.util.List findAllByColumn(java.lang.Object)` — missing.
+- `java.util.List findAllByRow(java.lang.Object)` — missing.
+- `java.util.List findAllList(java.lang.Object)` — missing.
+- `java.util.List getAll(java.lang.Object)` — missing.
+- `org.sikuli.script.Region unionAll(java.lang.Object)` — missing.
+- `boolean hasT(java.lang.String)` — missing.
+- `boolean containsMouse()` — missing.
+- `boolean getThrowException()` — missing.
+- `boolean hasEvents()` — missing.
+- `boolean hasObserver()` — missing.
+- `boolean hasText(java.lang.String)` — missing.
+- `boolean isObserving()` — missing.
+- `boolean isOtherScreen()` — missing.
+- `boolean isRasterValid()` — missing.
+- `boolean isValid()` — missing.
+- `boolean isVirtual()` — missing.
+- `boolean observe()` — missing.
+- `boolean observe(double)` — missing.
+- `boolean observeInBackground()` — missing.
+- `boolean observeInBackground(double)` — missing.
+- `boolean observeInLine(double)` — missing.
+- `boolean waitForStable()` — missing.
+- `boolean waitForStable(long, long)` — missing.
+- `boolean waitForStable(long, long, double)` — missing.
+- `boolean hasPrompt()` — missing.
+- `double getAutoWaitTimeout()` — missing.
+- `float getObserveScanRate()` — missing.
+- `float getWaitScanRate()` — missing.
+- `int getColW()` — missing.
+- `int getCols()` — missing.
+- `int getRepeatWaitTime()` — missing.
+- `int getRowH()` — missing.
+- `int getRows()` — missing.
+- `int mouseMove(int, int)` — arity_mismatch.
+- `int type(java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(int, int)` — missing.
+- `int getID()` — missing.
+- `java.awt.Rectangle getRect()` — missing.
+- `java.awt.Rectangle getBounds()` — static_mismatch.
+- `java.io.File file()` — missing.
+- `java.lang.Object action(java.lang.String, java.lang.Object[])` — missing.
+- `java.lang.String fileName()` — missing.
+- `java.lang.String getName()` — missing.
+- `java.lang.String textChar()` — missing.
+- `java.lang.String textLine()` — missing.
+- `java.lang.String textWord()` — missing.
+- `java.lang.String getLastScreenImageFile()` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String)` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String onChange()` — missing.
+- `java.lang.String onChange(java.lang.Integer)` — missing.
+- `java.lang.String onChange(java.lang.Integer, java.lang.Object)` — missing.
+- `java.lang.String onChange(java.lang.Object)` — missing.
+- `java.lang.String saveCapture(java.lang.Object[])` — missing.
+- `java.lang.String toString()` — missing.
+- `java.lang.String toStringShort()` — missing.
+- `java.lang.String getIDString()` — missing.
+- `java.util.Iterator getLastMatches()` — missing.
+- `java.util.List collectLinesText()` — missing.
+- `java.util.List collectWordsText()` — missing.
+- `java.util.List collectLines()` — missing.
+- `java.util.List collectWords()` — missing.
+- `java.util.List findAllT(java.lang.String)` — missing.
+- `java.util.List findLines()` — missing.
+- `java.util.List findLines(java.lang.String)` — missing.
+- `java.util.List findWords()` — missing.
+- `java.util.List findWords(java.lang.String)` — missing.
+- `java.util.List findAllText(java.lang.String)` — missing.
+- `java.util.List findAny(java.lang.Object[])` — missing.
+- `java.util.List findAnyList(java.util.List)` — missing.
+- `java.util.List waitAny(double, java.lang.Object[])` — missing.
+- `java.util.List waitAnyList(double, java.util.List)` — missing.
+- `org.sikuli.script.FindFailedResponse getFindFailedResponse()` — missing.
+- `org.sikuli.script.Image getImage()` — missing.
+- `org.sikuli.script.Location aboveAt()` — missing.
+- `org.sikuli.script.Location aboveAt(int)` — missing.
+- `org.sikuli.script.Location asOffset()` — missing.
+- `org.sikuli.script.Location belowAt()` — missing.
+- `org.sikuli.script.Location belowAt(int)` — missing.
+- `org.sikuli.script.Location checkMatch()` — missing.
+- `org.sikuli.script.Location getBottomLeft()` — missing.
+- `org.sikuli.script.Location getBottomRight()` — missing.
+- `org.sikuli.script.Location getCenter()` — missing.
+- `org.sikuli.script.Location getTarget()` — missing.
+- `org.sikuli.script.Location getTopLeft()` — missing.
+- `org.sikuli.script.Location getTopRight()` — missing.
+- `org.sikuli.script.Location leftAt()` — missing.
+- `org.sikuli.script.Location leftAt(int)` — missing.
+- `org.sikuli.script.Location rightAt()` — missing.
+- `org.sikuli.script.Location rightAt(int)` — missing.
+- `org.sikuli.script.Location newLocation(int, int)` — missing.
+- `org.sikuli.script.Location newLocation(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Location setOther(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Match existsT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findLine(java.lang.String)` — missing.
+- `org.sikuli.script.Match findT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findWord(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match findBest(java.lang.Object[])` — missing.
+- `org.sikuli.script.Match findBestList(java.util.List)` — missing.
+- `org.sikuli.script.Match waitBest(double, java.lang.Object[])` — missing.
+- `org.sikuli.script.Match waitBestList(double, java.util.List)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String, double)` — missing.
+- `org.sikuli.script.ObserveEvent getEvent(java.lang.String)` — missing.
+- `org.sikuli.script.ObserveEvent[] getEvents()` — missing.
+- `org.sikuli.script.Region add(int, int, int, int)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region copyTo(int)` — missing.
+- `org.sikuli.script.Region copyTo(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region get(int)` — missing.
+- `org.sikuli.script.Region getCell(int, int)` — missing.
+- `org.sikuli.script.Region getCol(int)` — missing.
+- `org.sikuli.script.Region getCol(int, int)` — missing.
+- `org.sikuli.script.Region getInset(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region getROI()` — missing.
+- `org.sikuli.script.Region getRow(int)` — missing.
+- `org.sikuli.script.Region getRow(int, int)` — missing.
+- `org.sikuli.script.Region grow()` — missing.
+- `org.sikuli.script.Region grow(int)` — missing.
+- `org.sikuli.script.Region grow(int, int)` — missing.
+- `org.sikuli.script.Region grow(int, int, int, int)` — missing.
+- `org.sikuli.script.Region highlight(double, java.lang.String)` — arity_mismatch.
+- `org.sikuli.script.Region highlight4py(java.util.ArrayList)` — missing.
+- `org.sikuli.script.Region highlightOff()` — missing.
+- `org.sikuli.script.Region highlightOn()` — missing.
+- `org.sikuli.script.Region highlightOn(java.lang.String)` — missing.
+- `org.sikuli.script.Region inside()` — missing.
+- `org.sikuli.script.Region intersection(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region morphTo(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region moveTo(org.sikuli.script.Location)` — arity_mismatch.
+- `org.sikuli.script.Region offset(int, int)` — missing.
+- `org.sikuli.script.Region offset(java.lang.Object)` — missing.
+- `org.sikuli.script.Region setBottomLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setBottomRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCenter(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCols(int)` — missing.
+- `org.sikuli.script.Region setLocation(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setOtherScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region setRaster(int, int)` — missing.
+- `org.sikuli.script.Region setRect(int, int, int, int)` — missing.
+- `org.sikuli.script.Region setRect(java.awt.Rectangle)` — missing.
+- `org.sikuli.script.Region setRect(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region setRows(int)` — missing.
+- `org.sikuli.script.Region setSize(int, int)` — missing.
+- `org.sikuli.script.Region setTopLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setTopRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region union(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region unionAny(java.lang.Object[])` — missing.
+- `org.sikuli.script.Region unionAnyList(java.util.List)` — missing.
+- `org.sikuli.script.Region newRegion(int, int, int, int)` — missing.
+- `org.sikuli.script.Region newRegion(org.sikuli.script.Location, int, int)` — missing.
+- `org.sikuli.script.Region newRegion(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region selectRegion()` — missing.
+- `org.sikuli.script.Region selectRegion(java.lang.String)` — missing.
+- `org.sikuli.script.Region setOther(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Screen getScreen()` — missing.
+- `org.sikuli.script.ScreenImage getLastScreenImage()` — missing.
+- `org.sikuli.script.ScreenImage capture(int, int, int, int)` — arity_mismatch.
+- `org.sikuli.script.ScreenImage capture(java.awt.Rectangle)` — arity_mismatch.
+- `org.sikuli.script.ScreenImage capture(org.sikuli.script.Region)` — arity_mismatch.
+- `org.sikuli.script.ScreenImage cmdCapture(java.lang.Object[])` — missing.
+- `org.sikuli.script.ScreenImage getLastScreenImageFromScreen()` — missing.
+- `org.sikuli.script.ScreenImage userCapture()` — missing.
+- `org.sikuli.script.ScreenImage userCapture(java.lang.String)` — missing.
+- `org.sikuli.support.Observer getObserver()` — missing.
+- `org.sikuli.support.devices.IRobot getRobot()` — missing.
+- `org.sikuli.support.devices.IScreen getScreenContaining()` — missing.
+- `static org.sikuli.script.Image getImageFromTarget(java.lang.Object)` — missing.
+- `static java.awt.image.BufferedImage getBufferedImage(java.lang.Object)` — missing.
+- `static int getPrimaryId()` — missing.
+- `static org.sikuli.script.Location atMouse()` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int, org.sikuli.support.devices.IScreen)` — missing.
+- `static org.sikuli.script.Region create(java.awt.Rectangle)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Region)` — missing.
+- `static org.sikuli.script.Region getDefaultInstance4py()` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region make4py(java.util.ArrayList)` — missing.
+- `static org.sikuli.script.Region virtual(java.awt.Rectangle)` — missing.
+- `static org.sikuli.script.Screen as(int)` — missing.
+- `static org.sikuli.script.Screen getDefaultInstance4py()` — missing.
+- `static org.sikuli.script.Screen getPrimaryScreen()` — missing.
+- `static org.sikuli.script.Screen getScreen(int)` — missing.
+- `static org.sikuli.script.Screen make4py(java.util.ArrayList)` — missing.
+- `static void highlightAllOff()` — missing.
+- `static void closePrompt()` — missing.
+- `static void closePrompt(org.sikuli.script.Screen)` — missing.
+- `static void doPrompt(java.lang.String, org.sikuli.util.EventObserver)` — missing.
+- `static void resetMonitors()` — missing.
+- `static void resetMonitorsQuiet()` — missing.
+- `static void resetPrompt(org.sikuli.util.OverlayCapturePrompt)` — missing.
+- `static void resetScreens()` — missing.
+- `static void showMonitors()` — missing.
+- `void setName(java.lang.String)` — missing.
+- `void aInput(java.lang.String)` — missing.
+- `void aKey(int)` — missing.
+- `void aSwipeDown()` — missing.
+- `void aSwipeLeft()` — missing.
+- `void aSwipeRight()` — missing.
+- `void aSwipeUp()` — missing.
+- `void delayClick(int)` — missing.
+- `void delayType(int)` — missing.
+- `void initScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `void internalUseOnlyHighlightReset()` — missing.
+- `void resetFindFailedResponse()` — missing.
+- `void resetScreen()` — missing.
+- `void resetThrowException()` — missing.
+- `void saveLastScreenImage()` — missing.
+- `void setActive(java.lang.String)` — missing.
+- `void setAutoWaitTimeout(double)` — missing.
+- `void setFindFailedHandler(java.lang.Object)` — missing.
+- `void setFindFailedResponse(org.sikuli.script.FindFailedResponse)` — missing.
+- `void setInactive(java.lang.String)` — missing.
+- `void setObserveScanRate(float)` — missing.
+- `void setOtherScreen()` — missing.
+- `void setROI()` — arity_mismatch.
+- `void setROI(java.awt.Rectangle)` — arity_mismatch.
+- `void setROI(org.sikuli.script.Region)` — arity_mismatch.
+- `void setRepeatWaitTime(int)` — missing.
+- `void setThrowException(boolean)` — missing.
+- `void setVirtual(boolean)` — missing.
+- `void setWaitScanRate(float)` — missing.
+- `void showScreens()` — missing.
+- `void stopObserver()` — missing.
+- `void stopObserver(java.lang.String)` — missing.
+- `void reset()` — missing.
+- `void setup(int)` — missing.
+- `void update(org.sikuli.util.EventSubject)` — missing.
+- `void waitAfterAction()` — missing.
+
+### `org.sikuli.script.ScreenImage`
+
+- `boolean equals(java.lang.Object)` — missing.
+- `double diffPercentage(org.sikuli.script.ScreenImage)` — missing.
+- `int hashCode()` — missing.
+- `java.awt.Rectangle getRect()` — missing.
+- `java.awt.image.BufferedImage getImage()` — missing.
+- `java.lang.String getFile()` — missing.
+- `java.lang.String getFile(java.lang.String)` — missing.
+- `java.lang.String getFile(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String getFilename()` — missing.
+- `java.lang.String getStoredAt()` — missing.
+- `java.lang.String save()` — missing.
+- `java.lang.String save(java.lang.String)` — missing.
+- `java.lang.String save(java.lang.String, java.lang.String)` — missing.
+- `java.lang.String saveInBundle(java.lang.String)` — missing.
+- `java.lang.String saveInto(java.io.File)` — missing.
+- `java.lang.String saveInto(java.lang.String)` — missing.
+- `org.sikuli.script.Region getRegion()` — missing.
+- `org.sikuli.script.ScreenImage getSub(java.awt.Rectangle)` — missing.
+- `void saveLastScreenImage(java.io.File)` — missing.
+
+### `org.sikuli.vnc.VNCScreen`
+
+- `int click(java.lang.Object, java.lang.Integer)` — arity_mismatch.
+- `int doubleClick(java.lang.Object)` — missing.
+- `int doubleClick(java.lang.Object, java.lang.Integer)` — missing.
+- `int drag(java.lang.Object)` — missing.
+- `int dragDrop(java.lang.Object)` — missing.
+- `int dragDrop(java.lang.Object, java.lang.Object)` — missing.
+- `int dropAt(java.lang.Object)` — missing.
+- `int hover(java.lang.Object)` — missing.
+- `int mouseMove(java.lang.Object)` — missing.
+- `int paste(java.lang.Object, java.lang.String)` — missing.
+- `int rightClick(java.lang.Object)` — missing.
+- `int rightClick(java.lang.Object, java.lang.Integer)` — missing.
+- `int type(java.lang.Object, java.lang.String)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.Object, java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(java.lang.Object, int, int)` — missing.
+- `int wheel(java.lang.Object, int, int, int)` — missing.
+- `void aSwipe(java.lang.Object, java.lang.Object)` — missing.
+- `void aTap(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object)` — missing.
+- `boolean has(java.lang.Object, double)` — missing.
+- `boolean waitVanish(java.lang.Object)` — missing.
+- `boolean waitVanish(java.lang.Object, double)` — missing.
+- `java.lang.String onAppear(java.lang.Object)` — missing.
+- `java.lang.String onAppear(java.lang.Object, java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object)` — missing.
+- `java.lang.String onVanish(java.lang.Object, java.lang.Object)` — missing.
+- `java.util.Iterator findAll(java.lang.Object)` — missing.
+- `java.util.List findAllByColumn(java.lang.Object)` — missing.
+- `java.util.List findAllByRow(java.lang.Object)` — missing.
+- `java.util.List findAllList(java.lang.Object)` — missing.
+- `java.util.List getAll(java.lang.Object)` — missing.
+- `org.sikuli.script.Match exists(java.lang.Object)` — missing.
+- `org.sikuli.script.Match exists(java.lang.Object, double)` — missing.
+- `org.sikuli.script.Match find(java.lang.Object)` — missing.
+- `org.sikuli.script.Match wait(java.lang.Object)` — missing.
+- `org.sikuli.script.Match wait(java.lang.Object, double)` — missing.
+- `org.sikuli.script.Region unionAll(java.lang.Object)` — missing.
+- `boolean hasT(java.lang.String)` — missing.
+- `boolean contains(org.sikuli.script.Location)` — missing.
+- `boolean contains(org.sikuli.script.Region)` — missing.
+- `boolean containsMouse()` — missing.
+- `boolean getThrowException()` — missing.
+- `boolean hasEvents()` — missing.
+- `boolean hasObserver()` — missing.
+- `boolean hasText(java.lang.String)` — missing.
+- `boolean isObserving()` — missing.
+- `boolean isOtherScreen()` — missing.
+- `boolean isRasterValid()` — missing.
+- `boolean isValid()` — missing.
+- `boolean isVirtual()` — missing.
+- `boolean observe()` — missing.
+- `boolean observe(double)` — missing.
+- `boolean observeInBackground()` — missing.
+- `boolean observeInBackground(double)` — missing.
+- `boolean observeInLine(double)` — missing.
+- `boolean waitForStable()` — missing.
+- `boolean waitForStable(long, long)` — missing.
+- `boolean isRunning()` — missing.
+- `boolean waitForScreenStable()` — missing.
+- `boolean waitForScreenStable(long, long)` — missing.
+- `boolean waitForStable(long, long, double)` — missing.
+- `com.sikulix.vnc.VNCClient getClient()` — missing.
+- `double getAutoWaitTimeout()` — missing.
+- `float getObserveScanRate()` — missing.
+- `float getWaitScanRate()` — missing.
+- `int getH()` — missing.
+- `int getW()` — missing.
+- `int getX()` — missing.
+- `int getY()` — missing.
+- `int click()` — arity_mismatch.
+- `int doubleClick()` — missing.
+- `int getColW()` — missing.
+- `int getCols()` — missing.
+- `int getRepeatWaitTime()` — missing.
+- `int getRowH()` — missing.
+- `int getRows()` — missing.
+- `int hover()` — missing.
+- `int mouseMove()` — missing.
+- `int mouseMove(int, int)` — missing.
+- `int paste(java.lang.String)` — missing.
+- `int rightClick()` — missing.
+- `int type(java.lang.String, int)` — arity_mismatch.
+- `int type(java.lang.String, java.lang.String)` — arity_mismatch.
+- `int wheel(int, int)` — missing.
+- `int write(java.lang.String)` — missing.
+- `int getID()` — missing.
+- `int getIdFromPoint(int, int)` — missing.
+- `java.awt.Rectangle getRect()` — missing.
+- `java.awt.Rectangle getBounds()` — missing.
+- `java.io.File file()` — missing.
+- `java.lang.Object action(java.lang.String, java.lang.Object[])` — missing.
+- `java.lang.String fileName()` — missing.
+- `java.lang.String getName()` — missing.
+- `java.lang.String text()` — missing.
+- `java.lang.String textChar()` — missing.
+- `java.lang.String textLine()` — missing.
+- `java.lang.String textWord()` — missing.
+- `java.lang.String getLastScreenImageFile()` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String)` — missing.
+- `java.lang.String onChange()` — missing.
+- `java.lang.String onChange(java.lang.Integer)` — missing.
+- `java.lang.String onChange(java.lang.Integer, java.lang.Object)` — missing.
+- `java.lang.String onChange(java.lang.Object)` — missing.
+- `java.lang.String saveCapture(java.lang.Object[])` — missing.
+- `java.lang.String toString()` — missing.
+- `java.lang.String toStringShort()` — missing.
+- `java.lang.String getIDString()` — missing.
+- `java.lang.String getLastScreenImageFile(java.lang.String, java.lang.String)` — missing.
+- `java.util.Iterator getLastMatches()` — missing.
+- `java.util.List collectLinesText()` — missing.
+- `java.util.List collectWordsText()` — missing.
+- `java.util.List textLines()` — missing.
+- `java.util.List textWords()` — missing.
+- `java.util.List collectLines()` — missing.
+- `java.util.List collectWords()` — missing.
+- `java.util.List findAllT(java.lang.String)` — missing.
+- `java.util.List findLines()` — missing.
+- `java.util.List findLines(java.lang.String)` — missing.
+- `java.util.List findWords()` — missing.
+- `java.util.List findWords(java.lang.String)` — missing.
+- `java.util.List findAllText(java.lang.String)` — missing.
+- `java.util.List findAny(java.lang.Object[])` — missing.
+- `java.util.List findAnyList(java.util.List)` — missing.
+- `java.util.List waitAny(double, java.lang.Object[])` — missing.
+- `java.util.List waitAnyList(double, java.util.List)` — missing.
+- `org.sikuli.script.FindFailedResponse getFindFailedResponse()` — missing.
+- `org.sikuli.script.Image getImage()` — missing.
+- `org.sikuli.script.Location aboveAt()` — missing.
+- `org.sikuli.script.Location aboveAt(int)` — missing.
+- `org.sikuli.script.Location asOffset()` — missing.
+- `org.sikuli.script.Location belowAt()` — missing.
+- `org.sikuli.script.Location belowAt(int)` — missing.
+- `org.sikuli.script.Location checkMatch()` — missing.
+- `org.sikuli.script.Location getBottomLeft()` — missing.
+- `org.sikuli.script.Location getBottomRight()` — missing.
+- `org.sikuli.script.Location getCenter()` — missing.
+- `org.sikuli.script.Location getTarget()` — missing.
+- `org.sikuli.script.Location getTopLeft()` — missing.
+- `org.sikuli.script.Location getTopRight()` — missing.
+- `org.sikuli.script.Location leftAt()` — missing.
+- `org.sikuli.script.Location leftAt(int)` — missing.
+- `org.sikuli.script.Location rightAt()` — missing.
+- `org.sikuli.script.Location rightAt(int)` — missing.
+- `org.sikuli.script.Location newLocation(int, int)` — missing.
+- `org.sikuli.script.Location newLocation(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Location set(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Location setOther(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Match existsT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findLine(java.lang.String)` — missing.
+- `org.sikuli.script.Match findT(java.lang.String)` — missing.
+- `org.sikuli.script.Match findWord(java.lang.String)` — missing.
+- `org.sikuli.script.Match getLastMatch()` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String)` — missing.
+- `org.sikuli.script.Match existsText(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match findBest(java.lang.Object[])` — missing.
+- `org.sikuli.script.Match findBestList(java.util.List)` — missing.
+- `org.sikuli.script.Match findText(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitBest(double, java.lang.Object[])` — missing.
+- `org.sikuli.script.Match waitBestList(double, java.util.List)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitT(java.lang.String, double)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String)` — missing.
+- `org.sikuli.script.Match waitText(java.lang.String, double)` — missing.
+- `org.sikuli.script.ObserveEvent getEvent(java.lang.String)` — missing.
+- `org.sikuli.script.ObserveEvent[] getEvents()` — missing.
+- `org.sikuli.script.Region above()` — missing.
+- `org.sikuli.script.Region above(int)` — missing.
+- `org.sikuli.script.Region add(int, int, int, int)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region add(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region below()` — missing.
+- `org.sikuli.script.Region below(int)` — missing.
+- `org.sikuli.script.Region copyTo(int)` — missing.
+- `org.sikuli.script.Region copyTo(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region get(int)` — missing.
+- `org.sikuli.script.Region getCell(int, int)` — missing.
+- `org.sikuli.script.Region getCol(int)` — missing.
+- `org.sikuli.script.Region getCol(int, int)` — missing.
+- `org.sikuli.script.Region getInset(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region getROI()` — missing.
+- `org.sikuli.script.Region getRow(int)` — missing.
+- `org.sikuli.script.Region getRow(int, int)` — missing.
+- `org.sikuli.script.Region grow()` — missing.
+- `org.sikuli.script.Region grow(int)` — missing.
+- `org.sikuli.script.Region grow(int, int)` — missing.
+- `org.sikuli.script.Region grow(int, int, int, int)` — missing.
+- `org.sikuli.script.Region highlight()` — missing.
+- `org.sikuli.script.Region highlight(double)` — missing.
+- `org.sikuli.script.Region highlight(double, java.lang.String)` — missing.
+- `org.sikuli.script.Region highlight(java.lang.String)` — missing.
+- `org.sikuli.script.Region highlight4py(java.util.ArrayList)` — missing.
+- `org.sikuli.script.Region highlightOff()` — missing.
+- `org.sikuli.script.Region highlightOn()` — missing.
+- `org.sikuli.script.Region highlightOn(java.lang.String)` — missing.
+- `org.sikuli.script.Region inside()` — missing.
+- `org.sikuli.script.Region intersection(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region left()` — missing.
+- `org.sikuli.script.Region left(int)` — missing.
+- `org.sikuli.script.Region morphTo(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region moveTo(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region nearby()` — missing.
+- `org.sikuli.script.Region nearby(int)` — missing.
+- `org.sikuli.script.Region offset(int, int)` — missing.
+- `org.sikuli.script.Region offset(java.lang.Object)` — missing.
+- `org.sikuli.script.Region right()` — missing.
+- `org.sikuli.script.Region right(int)` — missing.
+- `org.sikuli.script.Region setBottomLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setBottomRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCenter(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setCols(int)` — missing.
+- `org.sikuli.script.Region setH(int)` — missing.
+- `org.sikuli.script.Region setLocation(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setOtherScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `org.sikuli.script.Region setRaster(int, int)` — missing.
+- `org.sikuli.script.Region setRect(int, int, int, int)` — missing.
+- `org.sikuli.script.Region setRect(java.awt.Rectangle)` — missing.
+- `org.sikuli.script.Region setRect(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region setRows(int)` — missing.
+- `org.sikuli.script.Region setSize(int, int)` — missing.
+- `org.sikuli.script.Region setTopLeft(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setTopRight(org.sikuli.script.Location)` — missing.
+- `org.sikuli.script.Region setW(int)` — missing.
+- `org.sikuli.script.Region setX(int)` — missing.
+- `org.sikuli.script.Region setY(int)` — missing.
+- `org.sikuli.script.Region union(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region unionAny(java.lang.Object[])` — missing.
+- `org.sikuli.script.Region unionAnyList(java.util.List)` — missing.
+- `org.sikuli.script.Region newRegion(int, int, int, int)` — missing.
+- `org.sikuli.script.Region newRegion(org.sikuli.script.Location, int, int)` — missing.
+- `org.sikuli.script.Region newRegion(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region set(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.Region setOther(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.ScreenImage getLastScreenImage()` — missing.
+- `org.sikuli.script.ScreenImage capture()` — missing.
+- `org.sikuli.script.ScreenImage capture(int, int, int, int)` — missing.
+- `org.sikuli.script.ScreenImage capture(java.awt.Rectangle)` — missing.
+- `org.sikuli.script.ScreenImage capture(org.sikuli.script.Region)` — missing.
+- `org.sikuli.script.ScreenImage getLastScreenImageFromScreen()` — missing.
+- `org.sikuli.script.ScreenImage userCapture(java.lang.String)` — missing.
+- `org.sikuli.support.Observer getObserver()` — missing.
+- `org.sikuli.support.devices.IRobot getRobot()` — missing.
+- `org.sikuli.support.devices.IScreen getScreen()` — missing.
+- `org.sikuli.support.devices.IScreen getScreenContaining()` — missing.
+- `static org.sikuli.script.Image getImageFromTarget(java.lang.Object)` — missing.
+- `static java.awt.image.BufferedImage getBufferedImage(java.lang.Object)` — missing.
+- `static org.sikuli.script.Location atMouse()` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(int, int, int, int, org.sikuli.support.devices.IScreen)` — missing.
+- `static org.sikuli.script.Region create(java.awt.Rectangle)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region create(org.sikuli.script.Region)` — missing.
+- `static org.sikuli.script.Region getDefaultInstance4py()` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int)` — missing.
+- `static org.sikuli.script.Region grow(org.sikuli.script.Location, int, int, int, int)` — missing.
+- `static org.sikuli.script.Region make4py(java.util.ArrayList)` — missing.
+- `static org.sikuli.script.Region virtual(java.awt.Rectangle)` — missing.
+- `static org.sikuli.vnc.VNCScreen start()` — arity_mismatch.
+- `static org.sikuli.vnc.VNCScreen start(java.lang.String)` — arity_mismatch.
+- `static org.sikuli.vnc.VNCScreen start(java.lang.String, int)` — arity_mismatch.
+- `static org.sikuli.vnc.VNCScreen start(java.lang.String, int, int, int)` — arity_mismatch.
+- `static void highlightAllOff()` — missing.
+- `static void startUp(int)` — missing.
+- `static void stopAll()` — missing.
+- `void setName(java.lang.String)` — missing.
+- `void aInput(java.lang.String)` — missing.
+- `void aKey(int)` — missing.
+- `void aSwipeDown()` — missing.
+- `void aSwipeLeft()` — missing.
+- `void aSwipeRight()` — missing.
+- `void aSwipeUp()` — missing.
+- `void delayClick(int)` — missing.
+- `void delayType(int)` — missing.
+- `void initScreen(org.sikuli.support.devices.IScreen)` — missing.
+- `void internalUseOnlyHighlightReset()` — missing.
+- `void keyDown(int)` — missing.
+- `void keyDown(java.lang.String)` — missing.
+- `void keyUp()` — missing.
+- `void keyUp(int)` — missing.
+- `void keyUp(java.lang.String)` — missing.
+- `void mouseDown(int)` — missing.
+- `void mouseUp()` — missing.
+- `void mouseUp(int)` — missing.
+- `void resetFindFailedResponse()` — missing.
+- `void resetScreen()` — missing.
+- `void resetThrowException()` — missing.
+- `void saveLastScreenImage()` — missing.
+- `void setActive(java.lang.String)` — missing.
+- `void setAutoWaitTimeout(double)` — missing.
+- `void setFindFailedHandler(java.lang.Object)` — missing.
+- `void setFindFailedResponse(org.sikuli.script.FindFailedResponse)` — missing.
+- `void setInactive(java.lang.String)` — missing.
+- `void setObserveScanRate(float)` — missing.
+- `void setOtherScreen()` — missing.
+- `void setROI()` — missing.
+- `void setROI(int, int, int, int)` — missing.
+- `void setROI(java.awt.Rectangle)` — missing.
+- `void setROI(org.sikuli.script.Region)` — missing.
+- `void setRepeatWaitTime(int)` — missing.
+- `void setThrowException(boolean)` — missing.
+- `void setVirtual(boolean)` — missing.
+- `void setWaitScanRate(float)` — missing.
+- `void showScreens()` — missing.
+- `void stopObserver()` — missing.
+- `void stopObserver(java.lang.String)` — missing.
+- `void wait(double)` — missing.
+- `void update(org.sikuli.util.EventSubject)` — missing.
+- `void waitAfterAction()` — missing.
+
+## Unregistered public Java classes
+
+These classes still fall back to generic remote objects where reachable.
+
+- `com.sikulix.ocr.AmountVariantGenerator`
+- `com.sikulix.ocr.OCREngine`
+- `com.sikulix.opencv.Sikulix`
+- `com.sikulix.tigervnc.Sikulix`
+- `com.sikulix.util.SikuliLogger`
+- `com.sikulix.util.TextNormalizer`
+- `com.sikulix.vnc.VNCClient`
+- `com.sikulix.vnc.VNCClipboard`
+- `com.sikulix.vnc.VNCClipboard$Charset`
+- `com.sikulix.vnc.VNCClipboard$TextType`
+- `com.sikulix.vnc.VNCClipboard$TransferType`
+- `org.sikuli.android.ADBClient`
+- `org.sikuli.android.ADBDevice`
+- `org.sikuli.android.ADBRobot`
+- `org.sikuli.android.ADBTest`
+- `org.sikuli.basics.Debug`
+- `org.sikuli.basics.GenericHotkeyManager`
+- `org.sikuli.basics.HotkeyEvent`
+- `org.sikuli.basics.HotkeyListener`
+- `org.sikuli.basics.HotkeyManager`
+- `org.sikuli.basics.LinuxHotkeyManager`
+- `org.sikuli.basics.OS`
+- `org.sikuli.basics.PreferencesUser`
+- `org.sikuli.basics.Settings`
+- `org.sikuli.basics.SplashFrame`
+- `org.sikuli.guide.AnimationFactory`
+- `org.sikuli.guide.Animator`
+- `org.sikuli.guide.ClickableWindow`
+- `org.sikuli.guide.ComponentMover`
+- `org.sikuli.guide.GlobalMouseMotionListener`
+- `org.sikuli.guide.GlobalMouseMotionTracker`
+- `org.sikuli.guide.Guide`
+- `org.sikuli.guide.IAnimator`
+- `org.sikuli.guide.Run`
+- `org.sikuli.guide.ShadowRenderer`
+- `org.sikuli.guide.SxAnchor`
+- `org.sikuli.guide.SxAnchor$AnchorListener`
+- `org.sikuli.guide.SxArea`
+- `org.sikuli.guide.SxArrow`
+- `org.sikuli.guide.SxBeam`
+- `org.sikuli.guide.SxBracket`
+- `org.sikuli.guide.SxButton`
+- `org.sikuli.guide.SxCallout`
+- `org.sikuli.guide.SxCircle`
+- `org.sikuli.guide.SxClickable`
+- `org.sikuli.guide.SxFlag`
+- `org.sikuli.guide.SxHotspot`
+- `org.sikuli.guide.SxImage`
+- `org.sikuli.guide.SxMagnet`
+- `org.sikuli.guide.SxRectangle`
+- `org.sikuli.guide.SxSpotlight`
+- `org.sikuli.guide.SxText`
+- `org.sikuli.guide.TimeoutTransition`
+- `org.sikuli.guide.Tracker`
+- `org.sikuli.guide.Transition`
+- `org.sikuli.guide.Transition$TransitionListener`
+- `org.sikuli.guide.TransitionDialog`
+- `org.sikuli.guide.Visual`
+- `org.sikuli.guide.Visual$Layout`
+- `org.sikuli.hotkey.HotkeyCallback`
+- `org.sikuli.hotkey.HotkeyController`
+- `org.sikuli.hotkey.HotkeyEvent`
+- `org.sikuli.hotkey.Keys`
+- `org.sikuli.hotkey.Keys$Modifier`
+- `org.sikuli.natives.CommandExecutorException`
+- `org.sikuli.natives.CommandExecutorHelper`
+- `org.sikuli.natives.CommandExecutorResult`
+- `org.sikuli.natives.GenericOsUtil`
+- `org.sikuli.natives.LinuxUtil`
+- `org.sikuli.natives.MacUtil`
+- `org.sikuli.natives.OSUtil`
+- `org.sikuli.natives.OSUtil$OsProcess`
+- `org.sikuli.natives.OSUtil$OsWindow`
+- `org.sikuli.natives.SXUser32`
+- `org.sikuli.natives.SysUtil`
+- `org.sikuli.natives.WinUtil`
+- `org.sikuli.natives.mac.jna.CoreGraphics`
+- `org.sikuli.natives.mac.jna.CoreGraphics$CGPoint`
+- `org.sikuli.natives.mac.jna.CoreGraphics$CGRect`
+- `org.sikuli.natives.mac.jna.CoreGraphics$CGRect$CGRectByValue`
+- `org.sikuli.natives.mac.jna.CoreGraphics$CGRectRef`
+- `org.sikuli.natives.mac.jna.CoreGraphics$CGRectRef$CGRectByReference`
+- `org.sikuli.natives.mac.jna.CoreGraphics$CGSize`
+- `org.sikuli.natives.mac.jna.ObjC`
+- `org.sikuli.script.Button`
+- `org.sikuli.script.Constants`
+- `org.sikuli.script.Element`
+- `org.sikuli.script.Env`
+- `org.sikuli.script.FindFailed`
+- `org.sikuli.script.FindFailedResponse`
+- `org.sikuli.script.Finder`
+- `org.sikuli.script.ImageCallback`
+- `org.sikuli.script.ImagePath`
+- `org.sikuli.script.ImagePath$PathEntry`
+- `org.sikuli.script.Key`
+- `org.sikuli.script.KeyModifier`
+- `org.sikuli.script.MatchUtils`
+- `org.sikuli.script.Matches`
+- `org.sikuli.script.Mouse`
+- `org.sikuli.script.OCR$OEM`
+- `org.sikuli.script.OCR$PSM`
+- `org.sikuli.script.ObserveEvent`
+- `org.sikuli.script.ObserveEvent$Type`
+- `org.sikuli.script.ObserverCallBack`
+- `org.sikuli.script.OculixKeywords`
+- `org.sikuli.script.OculixTimeoutException`
+- `org.sikuli.script.Offset`
+- `org.sikuli.script.SX`
+- `org.sikuli.script.SX$Log`
+- `org.sikuli.script.ScreenOperationException`
+- `org.sikuli.script.SikuliEvent`
+- `org.sikuli.script.SikuliException`
+- `org.sikuli.script.SikuliXception`
+- `org.sikuli.script.TextRecognizer`
+- `org.sikuli.script.compare.DistanceComparator`
+- `org.sikuli.script.compare.HorizontalComparator`
+- `org.sikuli.script.compare.VerticalComparator`
+- `org.sikuli.support.ActionLogRenderer`
+- `org.sikuli.support.ActionLogRenderer$Mode`
+- `org.sikuli.support.AppLauncher`
+- `org.sikuli.support.AppLauncher$VncCommandBuilder`
+- `org.sikuli.support.CommandExecutor`
+- `org.sikuli.support.Commons`
+- `org.sikuli.support.Commons$Interpolation`
+- `org.sikuli.support.FileManager`
+- `org.sikuli.support.FileManager$FileFilter`
+- `org.sikuli.support.FindFailedDialog`
+- `org.sikuli.support.ImageGroup`
+- `org.sikuli.support.Observer`
+- `org.sikuli.support.Observer$State`
+- `org.sikuli.support.Observing`
+- `org.sikuli.support.PngChunk`
+- `org.sikuli.support.RemoteMode`
+- `org.sikuli.support.RemotePreflightCheck`
+- `org.sikuli.support.RemotePreflightCheck$CheckResult`
+- `org.sikuli.support.TesseractLastSeen`
+- `org.sikuli.support.animators.Animator`
+- `org.sikuli.support.animators.AnimatorLinear`
+- `org.sikuli.support.animators.AnimatorLinearInterpolation`
+- `org.sikuli.support.animators.AnimatorOutQuarticEase`
+- `org.sikuli.support.animators.AnimatorPulse`
+- `org.sikuli.support.animators.AnimatorQuarticEase`
+- `org.sikuli.support.animators.AnimatorStopExtention`
+- `org.sikuli.support.animators.AnimatorTimeBased`
+- `org.sikuli.support.animators.AnimatorTimeValueFunction`
+- `org.sikuli.support.devices.Device`
+- `org.sikuli.support.devices.Devices`
+- `org.sikuli.support.devices.Devices$TYPE`
+- `org.sikuli.support.devices.HelpDevice`
+- `org.sikuli.support.devices.IRobot`
+- `org.sikuli.support.devices.IRobot$KeyMode`
+- `org.sikuli.support.devices.IScreen`
+- `org.sikuli.support.devices.KeyboardLayout`
+- `org.sikuli.support.devices.MouseDevice`
+- `org.sikuli.support.devices.RobotDesktop`
+- `org.sikuli.support.devices.ScreenDevice`
+- `org.sikuli.support.gui.SXDialog`
+- `org.sikuli.support.gui.SXDialog$KEYS`
+- `org.sikuli.support.gui.SXDialog$POSITION`
+- `org.sikuli.support.recorder.PatternValidator`
+- `org.sikuli.support.recorder.PatternValidator$ValidationResult`
+- `org.sikuli.support.recorder.PatternValidator$Warning`
+- `org.sikuli.support.recorder.RecordedEventsFlow`
+- `org.sikuli.support.recorder.Recorder`
+- `org.sikuli.support.recorder.actions.ClickAction`
+- `org.sikuli.support.recorder.actions.DoubleClickAction`
+- `org.sikuli.support.recorder.actions.DragDropAction`
+- `org.sikuli.support.recorder.actions.IRecordedAction`
+- `org.sikuli.support.recorder.actions.MouseDownAction`
+- `org.sikuli.support.recorder.actions.MouseMoveAction`
+- `org.sikuli.support.recorder.actions.MouseUpAction`
+- `org.sikuli.support.recorder.actions.MouseWheelAction`
+- `org.sikuli.support.recorder.actions.PatternAction`
+- `org.sikuli.support.recorder.actions.RightClickAction`
+- `org.sikuli.support.recorder.actions.TypeKeyAction`
+- `org.sikuli.support.recorder.actions.TypeTextAction`
+- `org.sikuli.support.recorder.actions.WaitAction`
+- `org.sikuli.support.recorder.generators.ICodeGenerator`
+- `org.sikuli.support.recorder.generators.JavaCodeGenerator`
+- `org.sikuli.support.recorder.generators.JythonCodeGenerator`
+- `org.sikuli.support.recorder.generators.RobotFrameworkCodeGenerator`
+- `org.sikuli.support.runner.AbstractRunner`
+- `org.sikuli.support.runner.IRunner`
+- `org.sikuli.support.runner.IRunner$EffectiveRunner`
+- `org.sikuli.support.runner.IRunner$Options`
+- `org.sikuli.support.runner.ProcessRunner`
+- `org.sikuli.util.Crawler`
+- `org.sikuli.util.EventObserver`
+- `org.sikuli.util.EventSubject`
+- `org.sikuli.util.Highlight`
+- `org.sikuli.util.LinuxSupport`
+- `org.sikuli.util.OverlayCapturePrompt`
+- `org.sikuli.util.OverlayTransparentWindow`
+- `org.sikuli.util.Run`
+- `org.sikuli.util.SikulixFileChooser`

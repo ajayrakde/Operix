@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Line-delimited JSON-RPC server over stdin/stdout.
@@ -77,6 +78,9 @@ public final class Server {
         } catch (JSONException e) {
             writeError(id, "Invalid JSON: " + e.getMessage());
         } catch (Throwable t) {
+            while (t instanceof InvocationTargetException && t.getCause() != null) {
+                t = t.getCause();
+            }
             writeError(id, t.toString());
         }
     }

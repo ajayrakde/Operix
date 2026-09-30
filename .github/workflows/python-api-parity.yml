@@ -1,0 +1,36 @@
+name: Python Java API parity
+
+on:
+  push:
+    branches: ['python/java-api-parity']
+    paths:
+      - 'python/**'
+      - 'jvm-bridge/**'
+      - 'tools/**'
+      - 'docs/java-api-*.json.gz'
+      - 'docs/python-api-coverage.md'
+      - '.github/workflows/python-api-parity.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and test JVM bridge
+        working-directory: jvm-bridge
+        run: mvn -B package
+      - name: Install Python test dependencies
+        run: python -m pip install -e ./python pytest
+      - name: Test Python wrappers against real JVM
+        run: python -m pytest python/tests -q
+      - name: Check Java API inventory and explicit wrapper coverage
+        run: python tools/inventory_java_api.py --check

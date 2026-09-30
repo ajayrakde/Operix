@@ -24,8 +24,8 @@ not a substitute for explicit signatures and autocomplete.
 
 ## Remaining work
 
-1. Inventory public methods and overloads from the pinned JAR, including inherited
-   methods and nested OCR types. Keep an API coverage manifest in the repository.
+1. Use the committed Java inventory and coverage report to drive implementation.
+   Supplement missing source parameter names where the JAR lacks name metadata.
 2. Generate explicit Python signatures and overload type hints, with every Java
    parameter preserved. Remove Python defaults that change Java overload behavior.
 3. Expand runtime-class registration, including Java subclasses and enum types.
@@ -33,13 +33,13 @@ not a substitute for explicit signatures and autocomplete.
    the JVM bridge, with tests for overloaded calls and nested references.
 5. Complete OCR options, engines, text search and results. Match actual Java
    signatures rather than older example documentation.
-6. Run JVM integration and actual screen/OCR tests, then automate API coverage checks
-   so future Java releases expose changes rather than silently losing methods.
+6. Finish actual desktop and native OCR validation. The headless JVM tests and
+   reproducible API coverage check are now in place.
 
 The recursive Python codec does not yet convert JSON containers into Java
 collections or arrays. Unknown Java classes still use the generic proxy.
-The first implementation therefore establishes typed core objects; it does not
-claim complete API parity or desktop/OCR execution validation.
+The implementation establishes typed core objects and validates them against Java;
+it does not claim complete API parity or successful desktop/native OCR validation.
 
 ## Tests
 
@@ -50,3 +50,54 @@ PYTHONPATH=python/src python -m pytest python/tests -q
 Transport-level tests use recorded JSON requests and test typed dispatch, ownership,
 GC, argument conversion and result identity without a desktop. JVM integration tests
 require Java and `jvm-bridge/target/operix-jvm-bridge-1.0.0.jar`; build with Maven first.
+
+## JVM validation and API inventory
+
+- 41 Python tests pass, including 12 actual JVM integration tests.
+- 11 Java dispatcher/server tests pass.
+- Desktop and native OCR tests are explicit opt-in checks (2 skipped by default).
+- 211 public Java types and 3,168 distinct public method definitions were reflected
+  without initializing classes; no classes were unavailable. Per-class inventories
+  preserve inherited overloads and public constructors/fields.
+- [Coverage report](python-api-coverage.md) distinguishes explicit names and arities
+  from semantic parity. Dynamic forwarding does not count as explicit coverage.
+- [Compressed machine manifest](java-api-4.0.0.json.gz) contains complete type and
+  overload metadata. Decompress with Python's `gzip` module to inspect it.
+- Reflection errors now expose the invoked Java exception rather than just
+  `InvocationTargetException`. This improvement requires building the fork's bridge;
+  the upstream released 1.0.0 JAR still has the old error behavior.
+
+The native OCR smoke test was attempted and failed on this Linux runtime. Direct
+Java execution confirms JNA selects the system Tesseract 5.0.3 library, missing
+`TessBaseAPIGetPAGEText`. Typed OCR options and argument conversion pass; image-text
+recognition remains blocked by native library loading. No Windows OCR claim is made.
+
+The `Region.virtual()` check was also attempted and rejected by Oculix in the
+headless runtime. A real graphical desktop is required for that test.
+
+Rebuild and reproduce:
+
+```sh
+cd jvm-bridge
+mvn -B package
+cd ..
+python -m pip install -e ./python pytest
+python -m pytest python/tests -q
+python tools/inventory_java_api.py --check
+```
+
+Regenerate coverage after wrapper changes:
+
+```sh
+python tools/inventory_java_api.py
+```
+
+Java 17+ JDK is required for inventory generation. `--compiler-jar /path/to/ecj.jar`
+is an alternative for a JRE-only environment using Eclipse's Java compiler.
+
+Opt-in runtime checks (fail on errors rather than hiding them):
+
+```sh
+OCULIX_OCR_TESTS=1 python -m pytest python/tests/test_bridge.py -k real_ocr_image_read -q
+OCULIX_DESKTOP_TESTS=1 python -m pytest python/tests/test_bridge.py -k virtual_region -q
+```
