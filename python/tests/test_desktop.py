@@ -10,7 +10,7 @@ import oculix
 from oculix._bridge import Bridge
 
 ROOT = Path(__file__).resolve().parents[2]
-JAR = ROOT / 'jvm-bridge/target/operix-jvm-bridge-1.1.0.jar'
+JAR = ROOT / 'jvm-bridge/target/operix-jvm-bridge-1.1.1.jar'
 pytestmark = pytest.mark.skipif(os.environ.get('OCULIX_DESKTOP_TESTS') != '1', reason='Requires a graphical desktop')
 
 

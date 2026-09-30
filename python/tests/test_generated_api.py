@@ -30,9 +30,8 @@ def test_java_inheritance_nested_types_and_false_argument(bridge=None):
     assert issubclass(oculix.Screen, oculix.Region)
     assert oculix.OCR.Options.JAVA_CLASS == 'org.sikuli.script.OCR$Options'
     member = next(m for m in oculix.Region.setThrowException.overloads if len(m['parameters']) == 1)
-    args, score = _bind(member, (False,), {})
+    args = _bind(member, (False,), {})
     assert args == [False]
-    assert score >= 0
 
 
 def test_names_that_never_existed_are_not_exposed():
@@ -40,3 +39,12 @@ def test_names_that_never_existed_are_not_exposed():
     assert not hasattr(oculix.ADBScreen, 'tap')
     assert not hasattr(oculix.Region, 'capture')
     assert hasattr(oculix.Screen, 'capture')
+
+
+def test_nullable_and_generic_hints_are_source_backed():
+    from tools.generate_python_api import annotation
+    assert annotation('java.util.Iterator', {}, 'java.util.Iterator<org.sikuli.script.Match>') == 'Iterable[Any]'
+    assert annotation('java.util.List', {'org.sikuli.script.Match': 'Match'}, 'java.util.List<org.sikuli.script.Match>') == 'Sequence[Match]'
+    assert annotation('java.util.List', {}, 'java.util.List<? super java.lang.String>') == 'Sequence[Any]'
+    for name in ['exists', 'existsText', 'getLastMatch']:
+        assert all(m.get('nullable_return') for m in _SCHEMA['org.sikuli.script.Region']['methods'] if m['name'] == name)

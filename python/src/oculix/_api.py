@@ -23,57 +23,6 @@ def _identifier(name):
     return name + '_' if keyword.iskeyword(name) or name in {'self', 'cls'} else name
 
 
-def _is_java_type(actual, formal):
-    if actual == formal or formal == 'java.lang.Object': return True
-    seen = set()
-    pending = [actual]
-    while pending:
-        name = pending.pop()
-        if name == formal: return True
-        if name in seen: continue
-        seen.add(name)
-        row = _SCHEMA.get(name, {})
-        pending.extend(row.get('interfaces', []))
-        if row.get('superclass'): pending.append(row['superclass'])
-    return False
-
-
-def _score(value, formal):
-    if value is None:
-        return -1 if formal in {'boolean','byte','short','int','long','float','double','char'} else 0
-    if isinstance(value, RemoteWrapper): value = value._remote
-    if isinstance(value, RemoteObject):
-        if value._class == formal: return 12
-        if _is_java_type(value._class, formal): return 8 if formal != 'java.lang.Object' else 1
-        # External Java inheritance is verified by the JVM resolver.
-        return 2 if value._class not in _SCHEMA else -1
-    if isinstance(value, JavaCallback): return 8 if formal in {value.interface, 'java.lang.Object'} else -1
-    if callable(value): return 5 if formal == 'java.lang.Object' or _SCHEMA.get(formal, {}).get('interface') else -1
-    if formal == 'java.lang.Object': return 1
-    if type(value) is bool: return 12 if formal in {'boolean','java.lang.Boolean'} else -1
-    if type(value) is int:
-        if formal in {'int','java.lang.Integer'}: return 12 if -(2**31) <= value < 2**31 else -1
-        if formal in {'long','java.lang.Long'}: return 10 if -(2**63) <= value < 2**63 else -1
-        if formal in {'short','java.lang.Short'}: return 8 if -(2**15) <= value < 2**15 else -1
-        if formal in {'byte','java.lang.Byte'}: return 7 if -128 <= value <= 127 else -1
-        return 5 if formal in {'double','float','java.lang.Double','java.lang.Float'} else -1
-    if isinstance(value, float):
-        return 12 if formal in {'double','java.lang.Double'} else 8 if formal in {'float','java.lang.Float'} else -1
-    if isinstance(value, str):
-        if formal == 'java.lang.String': return 12
-        if formal == 'java.lang.CharSequence': return 10
-        if formal in {'char','java.lang.Character'}: return 8 if len(value) == 1 else -1
-        return 5 if _SCHEMA.get(formal, {}).get('enum') else -1
-    if isinstance(value, (bytes, bytearray)) and formal == 'byte[]': return 12
-    if isinstance(value, (list, tuple, bytes, bytearray)):
-        if formal.endswith('[]'):
-            scores = [_score(v, formal[:-2]) for v in value]
-            return -1 if any(v < 0 for v in scores) else 8
-        return 6 if formal in {'java.util.List','java.util.Collection','java.lang.Iterable','java.util.Set'} else -1
-    if isinstance(value, dict): return 8 if formal == 'java.util.Map' else -1
-    return -1
-
-
 def _bind(member, args, kwargs):
     parameters = member['parameters']
     values = list(args)
@@ -92,13 +41,16 @@ def _bind(member, args, kwargs):
     if set(kwargs) - known: raise TypeError('Unknown argument: ' + ', '.join(set(kwargs) - known))
     if varargs:
         # Both Java's explicit array form and Python's expanded positional form.
-        if len(values) == len(parameters) and isinstance(values[-1], (list, tuple)):
+        final = values[-1] if values else None
+        remote = final._remote if isinstance(final, RemoteWrapper) else final
+        explicit_array = (final is None or isinstance(final, (list, tuple))
+                          or isinstance(final, (bytes, bytearray)) and parameters[-1]['type'] == 'byte[]'
+                          or isinstance(remote, RemoteObject) and remote._class.startswith('['))
+        if len(values) == len(parameters) and explicit_array:
             pass
         else: values = values[:fixed] + [values[fixed:]]
     elif len(values) != len(parameters): raise TypeError('Wrong argument count')
-    scores = [_score(v, p['type']) for v, p in zip(values, parameters)]
-    if any(s < 0 for s in scores): raise TypeError('Argument types do not match')
-    return values, sum(scores) - int(varargs)
+    return values
 
 
 class BoundJavaMethod:
@@ -120,34 +72,28 @@ class BoundJavaMethod:
         return BoundJavaMethod(JavaMethod(self.descriptor.name, members), self.instance, self.owner)
 
     def __call__(self, *args, **kwargs):
-        candidates = []
-        for m in self.descriptor.members:
-            if self.instance is None and not m['static'] and self.__name__ != '<init>': continue
-            try: values, score = _bind(m, args, kwargs)
-            except TypeError: continue
-            candidates.append((score, m, values))
-        if not candidates:
-            raise TypeError(f'No matching overload for {self.owner.JAVA_CLASS}.{self.__name__}; see .overloads')
-        best_score = max(c[0] for c in candidates)
-        best = [c for c in candidates if c[0] == best_score]
-        # Drop less specific reference overloads for null/reference arguments.
-        if len(best) > 1:
-            specific = [c for c in best if all(c is other or all(
-                a['type'] == b['type'] or _is_java_type(a['type'], b['type'])
-                for a, b in zip(c[1]['parameters'], other[1]['parameters'])) for other in best)]
-            if len(specific) == 1: best = specific
-        signatures = {tuple(p['type'] for p in c[1]['parameters']) for c in best}
-        if len(signatures) > 1:
-            raise TypeError(f'Ambiguous Java overload for {self.__name__}: {sorted(signatures)}; use .overload(*types)')
-        _, member, values = best[0]
         bridge = self.instance._remote._bridge if self.instance is not None else _default_bridge()
-        prepared = []
-        for p, v in zip(member['parameters'], values):
-            if callable(v) and not isinstance(v, JavaCallback):
-                interface = p['type']
-                if interface == 'java.lang.Object': interface = 'org.sikuli.script.ObserverCallBack'
-                v = JavaCallback(interface, v)
-            prepared.append(v)
+        candidates = []
+        for member in self.descriptor.members:
+            if self.instance is None and not member['static'] and self.__name__ != '<init>': continue
+            try: values = _bind(member, args, kwargs)
+            except TypeError: continue
+            prepared = []
+            for parameter, value in zip(member['parameters'], values):
+                if callable(value) and not isinstance(value, JavaCallback):
+                    interface = parameter['type']
+                    if interface == 'java.lang.Object': interface = 'org.sikuli.script.ObserverCallBack'
+                    value = JavaCallback(interface, value)
+                prepared.append(value)
+            candidates.append((member, prepared))
+        if not candidates:
+            raise TypeError(f'No matching argument names/count for {self.owner.JAVA_CLASS}.{self.__name__}; see .overloads')
+        # Java owns assignability, interface inheritance, unboxing and conversion.
+        # Python only binds argument names/counts; stubs never gate runtime values.
+        if len(candidates) > 1:
+            index = bridge.resolve_overload(self.owner.JAVA_CLASS, self.__name__, candidates)
+        else: index = 0
+        member, prepared = candidates[index]
         types = [p['type'] for p in member['parameters']]
         if self.__name__ == '<init>': return bridge.create(self.owner.JAVA_CLASS, prepared, parameter_types=types)
         if member['static']:
@@ -178,7 +124,6 @@ class JavaField:
         self.set(type(instance), instance, value)
     def set(self, owner, instance, value):
         if self.field['final']: raise AttributeError('Java field is final: ' + self.field['name'])
-        if _score(value, self.field['type']) < 0: raise TypeError('Value does not match Java field type ' + self.field['type'])
         bridge = instance._remote._bridge if instance is not None else _default_bridge()
         from ._bridge import _encode
         req = {'class': owner.JAVA_CLASS, 'field': self.field['name'], 'value': _encode(value, bridge)}

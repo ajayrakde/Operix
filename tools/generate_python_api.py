@@ -26,9 +26,17 @@ def enrich(member, sources):
     if member['name'] == 'valueOf' and len(member['parameters']) == 1 and member['parameters'][0]['type'] == 'java.lang.String':
         member['parameters'][0].update(name='name', name_present=True)
     if found:
+        member['nullable_return'] = found.get('nullable_return', False)
         for p, source in zip(member['parameters'], found['parameters']):
             p['name'] = source['name']
             p['name_present'] = True
+    # Reviewed nullable fields / catch paths: initialization alone cannot
+    # establish return nullability (e.g. Match.getTarget repairs its null field).
+    if (member['declaring_class'], member['name']) in {
+            ('org.sikuli.script.Element', 'getLastMatch'),
+            ('org.sikuli.script.Element', 'getLastMatches'),
+            ('org.sikuli.script.Region', 'existsText')}:
+        member['nullable_return'] = True
     return member
 
 
@@ -36,21 +44,61 @@ def identifier(name):
     return name + '_' if keyword.iskeyword(name) else name
 
 
-def annotation(name, known):
+def split_generic(value):
+    result, start, depth = [], 0, 0
+    for i, char in enumerate(value):
+        if char == '<': depth += 1
+        elif char == '>': depth -= 1
+        elif char == ',' and depth == 0:
+            result.append(value[start:i].strip()); start = i + 1
+    return result + [value[start:].strip()]
+
+
+def annotation(name, known, generic=None):
+    generic = generic or name
     if name.endswith('[]'):
-        return 'Sequence[' + annotation(name[:-2], known) + ']'
+        return 'Sequence[' + annotation(name[:-2], known, generic[:-2] if generic.endswith('[]') else name[:-2]) + ']'
     if name in {'boolean', 'java.lang.Boolean'}: return 'bool'
     if name in {'byte', 'short', 'int', 'long', 'java.lang.Integer', 'java.lang.Long', 'java.lang.Short', 'java.lang.Byte'}: return 'int'
     if name in {'float', 'double', 'java.lang.Double', 'java.lang.Float'}: return 'float'
     if name in {'char', 'java.lang.Character', 'java.lang.String'}: return 'str'
     if name == 'void': return 'None'
     if name in known: return known[name]
-    if name.startswith('java.util.') and any(x in name for x in ['List', 'Collection', 'Set']): return 'Sequence[Any]'
-    if name.startswith('java.util.') and 'Map' in name: return 'Mapping[Any, Any]'
+    args = split_generic(generic[generic.index('<') + 1:-1]) if '<' in generic and generic.endswith('>') else []
+    def element(index):
+        if index >= len(args) or args[index].startswith('?'): return 'Any'
+        raw = args[index].split('<', 1)[0]
+        return annotation(raw, known, args[index])
+    if name.startswith('java.util.') and any(x in name for x in ['List', 'Collection', 'Set']): return 'Sequence[' + element(0) + ']'
+    if name.startswith('java.util.') and 'Map' in name: return 'Mapping[' + element(0) + ', ' + element(1) + ']'
+    if name in {'java.util.Iterator', 'java.lang.Iterable'}: return 'Iterable[' + element(0) + ']'
     return 'Any'
 
 
+def input_annotation(parameter, known, schema):
+    name = parameter['type']
+    typ = annotation(name, known, parameter.get('generic_type'))
+    if typ == 'Any': return typ
+    choices = [typ, 'JavaObject']
+    if name == 'byte[]': choices += ['bytes', 'bytearray']
+    if schema.get(name, {}).get('enum'): choices.append('str')
+    if schema.get(name, {}).get('interface') or name == 'org.sikuli.script.ObserverCallBack':
+        choices += ['JavaCallback', 'Callable[..., Any]']
+    if name not in {'boolean', 'byte', 'short', 'int', 'long', 'float', 'double', 'char'}: choices.append('None')
+    return 'Union[' + ', '.join(dict.fromkeys(choices)) + ']'
+
+
 def generate(manifest, sources):
+    # Propagate explicit return-null evidence through same-class return delegates.
+    changed = True
+    while changed:
+        changed = False
+        for members in sources.values():
+            for member in members:
+                if member.get('nullable_return'): continue
+                if any(other.get('nullable_return') and other['name'] == call['name'] and len(other['parameters']) == call['arity']
+                       for call in member.get('return_calls', []) for other in members):
+                    member['nullable_return'] = True; changed = True
     methods = [enrich(dict(m, parameters=[dict(p) for p in m['parameters']]), sources) for m in manifest['methods']]
     schema = {}
     known = {c['class']: c['class'].split('.')[-1].replace('$', '_') for c in manifest['classes']}
@@ -65,8 +113,8 @@ def generate(manifest, sources):
         row['python_name'] = known[c['class']]
         schema[c['class']] = row
     lines = ['"""Generated Oculix 4.0.0 API. Do not edit; run tools/generate_python_api.py."""',
-             'from typing import Any, Sequence, Mapping, overload, ClassVar',
-             'from oculix._api import JavaObject', '']
+             'from typing import Any, Sequence, Mapping, Iterable, Union, Optional, Callable, overload, ClassVar',
+             'from oculix._api import JavaObject, JavaCallback', '']
     ordered = []
     todo = set(schema)
     while todo:
@@ -99,11 +147,12 @@ def generate(manifest, sources):
                 for i, p in enumerate(m['parameters']):
                     pname = identifier(p['name'])
                     if pname in {'self', 'cls'}: pname += '_'
-                    typ = annotation(p['type'], known)
+                    typ = input_annotation(p, known, schema)
                     if m['varargs'] and i == len(m['parameters']) - 1:
-                        params.append('*' + pname + ': ' + annotation(p['type'][:-2], known))
+                        params.append('*' + pname + ': Union[' + input_annotation(dict(p, type=p['type'][:-2], generic_type=p.get('generic_type', p['type'])[:-2]), known, schema) + ', ' + typ + ']')
                     else: params.append(pname + ': ' + typ)
-                result = 'None' if pyname == '__init__' else annotation(m['return_type'], known)
+                result = 'None' if pyname == '__init__' else annotation(m['return_type'], known, m.get('generic_return_type'))
+                if m.get('nullable_return') and result not in {'Any', 'None'}: result = f'Optional[{result}]'
                 lines.append(f"    def {pyname}({', '.join(params)}) -> {result}: ...")
         # Nested public classes retain Java's Outer.Inner access.
         for child in sorted(schema):

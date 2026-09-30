@@ -16,7 +16,7 @@ from oculix import Location, OCR, Pattern, Region, JavaObject
 from oculix._bridge import Bridge, BridgeError, RemoteObject
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.1.0.jar"
+LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.1.1.jar"
 
 
 def _java_available() -> bool:
@@ -214,3 +214,58 @@ def test_callbacks_can_make_nested_java_calls(bridge):
 def test_iterator_result_is_python_iterable(bridge):
     stream = bridge.call_static('java.util.Arrays', 'stream', [[3, 1, 2]], parameter_types=['java.lang.Object[]'])
     assert list(stream._call('iterator')) == [3, 1, 2]
+
+
+def test_named_binding_uses_jvm_inheritance_and_collection_types(bridge, monkeypatch):
+    import oculix
+    from oculix._api import JavaMeta, JavaObject, JavaMethod
+    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+
+    # Exercise the exact generated binding path against public JDK signatures.
+    def facade(name, method, signatures):
+        members = [{'name': method, 'static': True, 'varargs': False,
+                    'parameters': [{'name': 'arg' + str(i), 'type': typ} for i, typ in enumerate(types)]}
+                   for types in signatures]
+        return JavaMeta('TestFacade', (JavaObject,), {'JAVA_CLASS': name, method: JavaMethod(method, members)})
+
+    numbers = facade('java.lang.String', 'valueOf', [['java.lang.Object'], ['int'], ['double']])
+    assert numbers.valueOf(3) == '3'
+    assert numbers.valueOf(3.5) == '3.5'
+    assert numbers.valueOf(None) == 'null'
+    failure = oculix.FindFailed("missing")
+    # Known Oculix objects remain valid for Java reference signatures.
+    assert numbers.valueOf(failure) == failure.toString()
+    collections = facade('java.util.Collections', 'max', [['java.util.Collection']])
+    assert collections.max([1, 3, 2]) == 3
+    stream = bridge.call_static('java.util.Arrays', 'stream', [[3, 1, 2]], parameter_types=['java.lang.Object[]'])
+    assert list(stream._call('iterator')) == [3, 1, 2]
+
+
+def test_named_varargs_accept_null_array_and_remote_array(bridge, monkeypatch):
+    import oculix
+    from oculix._api import JavaMeta, JavaObject, JavaMethod
+    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    member = {'name': 'format', 'static': True, 'varargs': True,
+              'parameters': [{'name': 'format', 'type': 'java.lang.String'},
+                             {'name': 'args', 'type': 'java.lang.Object[]'}]}
+    strings = JavaMeta('Strings', (JavaObject,), {'JAVA_CLASS': 'java.lang.String', 'format': JavaMethod('format', [member])})
+    assert strings.format('%s %s', None) == 'null null'
+    assert strings.format('%s %s', ['one', 'two']) == 'one two'
+    assert strings.format('%s %s', 'one', 'two') == 'one two'
+    assert strings.format('%s', args=['one']) == 'one'
+    failure = oculix.FindFailed('missing')
+    assert strings.format('%s', failure) == failure.toString()
+
+
+def test_input_maps_preserve_non_string_keys_and_reserved_names(bridge):
+    value = {3: 'three', '__map': 'ordinary data', 'nested': {7: [1, 2]}}
+    assert bridge.call_static('java.util.Collections', 'singletonList', [value]) == [value]
+
+
+def test_callback_return_is_checked_against_java_signature(bridge):
+    from oculix import JavaCallback
+    stream = bridge.call_static('java.util.Arrays', 'stream', [[1]], parameter_types=['java.lang.Object[]'])
+    predicate = JavaCallback('java.util.function.Predicate', lambda value: 'not a boolean')
+    filtered = bridge.call(stream._ref, 'filter', [predicate], parameter_types=['java.util.function.Predicate'])
+    with pytest.raises(BridgeError, match='Cannot assign java.lang.String to boolean'):
+        filtered._call('count')

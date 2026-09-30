@@ -9,10 +9,10 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--jar', type=Path, default=ROOT / 'jvm-bridge/target/operix-jvm-bridge-1.1.0.jar')
+parser.add_argument('--jar', type=Path, default=ROOT / 'jvm-bridge/target/operix-jvm-bridge-1.1.1.jar')
 parser.add_argument('--download', action='store_true', help='Exercise automatic download of the released fork JAR.')
 args = parser.parse_args()
-wheel = next((ROOT / 'python/dist').glob('oculix_operix-1.1.0-*.whl'))
+wheel = next((ROOT / 'python/dist').glob('oculix_operix-1.1.1-*.whl'))
 with tempfile.TemporaryDirectory(prefix='operix-wheel-') as directory:
     target = Path(directory) / 'site'
     subprocess.run([sys.executable, '-m', 'pip', 'install', '--no-deps', '--target', str(target), str(wheel)], check=True)

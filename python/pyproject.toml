@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "oculix-operix"
-version = "1.1.0"
+version = "1.1.1"
 description = "Visual automation for the real world — Python wrapper for OculiX"
 readme = "README.md"
 license = {text = "MIT"}
@@ -30,4 +30,4 @@ where = ["src"]
 testpaths = ["tests"]
 
 [tool.setuptools.package-data]
-oculix = ["_api_schema.json.gz", "py.typed", "**/*.pyi"]
+oculix = ["_api_schema.json.gz", "py.typed", "*.pyi", "**/*.pyi"]

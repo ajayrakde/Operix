@@ -180,4 +180,54 @@ class DispatcherTest {
                 .put("args", new JSONArray());
         assertThrows(ClassNotFoundException.class, () -> dispatcher.dispatch(req));
     }
+    public static class Compatibility {
+        public static String number(Number value) { return value.getClass().getSimpleName(); }
+        public static String choose(Number value) { return "number"; }
+        public static String choose(java.io.Serializable value) { return "serializable"; }
+        public static String serializable(java.io.Serializable value) { return value.toString(); }
+        public static String text(Comparable<?> value) { return value.toString(); }
+        public static int list(java.util.AbstractList<?> value) { return value.size(); }
+        public static boolean callback(boolean value) { return value; }
+        public static int character(int value) { return value; }
+    }
+
+    private JSONObject exact(String method, String type, Object value) throws Exception {
+        return dispatcher.dispatch(new JSONObject().put("class", Compatibility.class.getName())
+            .put("method", method).put("static", true).put("parameter_types", new JSONArray().put(type))
+            .put("args", new JSONArray().put(value)));
+    }
+
+    @Test
+    void validJavaInterfacesAndNumericSupertypesRemainAccepted() throws Exception {
+        assertEquals(Compatibility.number(3), exact("number", "java.lang.Number", 3).getString("result"));
+        assertEquals(Compatibility.text("hello"), exact("text", "java.lang.Comparable", "hello").getString("result"));
+        assertEquals(Compatibility.list(new java.util.ArrayList<>(java.util.Arrays.asList(1, 2))),
+            exact("list", "java.util.AbstractList", new JSONArray().put(1).put(2)).getInt("result"));
+        org.sikuli.script.FindFailed failure = new org.sikuli.script.FindFailed("missing");
+        String locationRef = registry.register(failure);
+        assertTrue(dispatcher.decode(new JSONObject().put("__ref", locationRef)) instanceof java.io.Serializable);
+        assertEquals(Compatibility.serializable(failure), exact("serializable", "java.io.Serializable",
+            new JSONObject().put("__ref", locationRef)).getString("result"));
+    }
+
+    @Test
+    void overloadUsesJvmSpecificityBeyondTheInventory() throws Exception {
+        JSONArray candidates = new JSONArray();
+        for (String type : new String[]{"java.io.Serializable", "java.lang.Number"}) candidates.put(new JSONObject()
+            .put("parameter_types", new JSONArray().put(type)).put("args", new JSONArray().put(3)));
+        int index = dispatcher.dispatch(new JSONObject().put("class", Compatibility.class.getName())
+            .put("resolve", "choose").put("candidates", candidates)).getInt("result");
+        assertEquals(1, index);
+        assertEquals("number", Compatibility.choose(3));
+    }
+
+    @Test
+    void callbackValidationAcceptsJavaUnboxingAndRejectsIncompatibleValues() throws Exception {
+        assertEquals(Compatibility.callback(Boolean.TRUE), Dispatcher.coerceOne(boolean.class, Boolean.TRUE));
+        assertEquals(Compatibility.character(Character.valueOf('A')), Dispatcher.coerceOne(int.class, Character.valueOf('A')));
+        assertThrows(IllegalArgumentException.class, () -> Dispatcher.coerceOne(boolean.class, "true"));
+        assertThrows(IllegalArgumentException.class, () -> Compatibility.class.getMethod("callback", boolean.class).invoke(null, "true"));
+        assertThrows(IllegalArgumentException.class, () -> Dispatcher.coerceOne(int.class, null));
+    }
+
 }

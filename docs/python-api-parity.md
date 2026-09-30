@@ -1,7 +1,7 @@
 # Python / Oculix Java API parity
 
 Target: Oculix **4.0.0**, pinned by `jvm-bridge/pom.xml`.
-Fork distribution: **oculix-operix 1.1.0**; Python imports remain `oculix`.
+Fork distribution: **oculix-operix 1.1.1**; Python imports remain `oculix`.
 
 ## Implemented API
 
@@ -14,8 +14,8 @@ Fork distribution: **oculix-operix 1.1.0**; Python imports remain `oculix`.
   public inheritance, nested types, enum constants, parameter types and varargs
   are preserved. Unsupported older declarations were removed.
 - Generated `.pyi` declarations provide named arguments, overloads, return hints
-  and editor completion. The runtime binds against the same finite declaration
-  set rather than accepting arbitrary Oculix method names.
+  and editor completion. The runtime binds names and counts against the same finite declaration
+  set; Java resolves type compatibility using its actual runtime classes.
 - Published source declarations supplement binary parameter metadata. Fourteen
   VNC declarations lack parameter names in the available source artifact and
   preserve the binary names `arg0`, etc.; every argument and type is still present.
@@ -37,9 +37,9 @@ Fork distribution: **oculix-operix 1.1.0**; Python imports remain `oculix`.
 
 ## Validation
 
-The local JVM/transport suite passes 50 tests, including exact overloads, typed
+The JVM/transport suite covers exact overloads, typed
 identity, nested maps/arrays, enum and field access, iterator access and a callback
-that performs nested Java calls. Eleven Java dispatcher/server tests pass.
+that performs nested Java calls. Java dispatcher/server tests include direct Java/RPC compatibility comparisons.
 
 Native image OCR passes with and without options on Linux and Windows Server 2025
 x64 using Java 17 / Python 3.12. Linux explicitly binds the bundled matching
@@ -95,3 +95,6 @@ without dependency resolution. Its compressed output is committed as
 `tools/java-source-parameters.json.gz`. `tools/generate_python_api.py` combines
 source names with the binary inventory to generate the packaged runtime schema
 and complete overload stubs. CI fails if either generated artifact is stale.
+
+[Argument compatibility audit](python-argument-compatibility.md) documents JVM
+authority, conservative hints, transport conversions and validation limits.

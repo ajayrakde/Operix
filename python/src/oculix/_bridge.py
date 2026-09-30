@@ -22,7 +22,7 @@ from typing import Any, Optional, Type
 
 # --- bridge JAR distribution -------------------------------------------------
 
-BRIDGE_VERSION = "1.1.0"
+BRIDGE_VERSION = "1.1.1"
 BRIDGE_JAR_NAME = f"operix-jvm-bridge-{BRIDGE_VERSION}.jar"
 BRIDGE_JAR_URL = (
     "https://github.com/ajayrakde/Operix/releases/download/"
@@ -215,6 +215,11 @@ class Bridge:
         result = self._request(payload)
         return _decode(self, result)
 
+    def resolve_overload(self, classname, method, candidates):
+        return self._request({'class': classname, 'resolve': method, 'candidates': [
+            {'parameter_types': [p['type'] for p in member['parameters']],
+             'args': _encode_args(values, self)} for member, values in candidates]})
+
     def release(self, ref: str) -> None:
         # A dead bridge must not restart just to release a stale object.
         if self._proc is None: return
@@ -318,8 +323,8 @@ def _encode(v: Any, bridge: Optional[Bridge] = None) -> Any:
     if isinstance(v, (list, tuple)):
         return [_encode(item, bridge) for item in v]
     if isinstance(v, dict):
-        if "__ref" in v:
-            raise ValueError("Pass a Java wrapper, not a raw __ref dictionary")
+        if any(not isinstance(key, str) for key in v) or any(key.startswith('__') for key in v):
+            return {'__map': [[_encode(key, bridge), _encode(item, bridge)] for key, item in v.items()]}
         return {key: _encode(item, bridge) for key, item in v.items()}
     return v
 

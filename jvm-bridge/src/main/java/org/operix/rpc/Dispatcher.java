@@ -32,6 +32,7 @@ final class Dispatcher {
     interface CallbackFactory { Object create(String id, String type) throws Exception; }
 
     JSONObject dispatch(JSONObject req) throws Exception {
+        if (req.has("resolve")) return new JSONObject().put("result", resolveOverload(req));
         // Release flow: drop a ref, no return value.
         if (req.optBoolean("release", false)) {
             registry.release(req.getString("ref"));
@@ -93,6 +94,43 @@ final class Dispatcher {
         }
 
         return new JSONObject().put("result", encode(result));
+    }
+
+    /** Resolve generated candidates using the actual JVM type graph. */
+    private int resolveOverload(JSONObject req) throws Exception {
+        Class<?> owner = Class.forName(req.getString("class"));
+        String name = req.getString("resolve");
+        JSONArray candidates = req.getJSONArray("candidates");
+        List<Integer> best = new ArrayList<>();
+        List<Class<?>[]> signatures = new ArrayList<>();
+        int bestScore = -1;
+        for (int i = 0; i < candidates.length(); i++) {
+            JSONObject candidate = candidates.getJSONObject(i);
+            Class<?>[] types = parameterTypes(candidate.getJSONArray("parameter_types"));
+            signatures.add(types);
+            Executable member = name.equals("<init>") ? owner.getConstructor(types) : owner.getMethod(name, types);
+            int score = executableScore(member, decodeArgs(candidate.getJSONArray("args")));
+            if (score < 0) continue;
+            if (score > bestScore) { best.clear(); bestScore = score; }
+            if (score == bestScore) best.add(i);
+        }
+        if (best.isEmpty()) throw new IllegalArgumentException("No compatible Java overload for " + owner.getName() + "." + name);
+        if (best.size() == 1) return best.get(0);
+        for (int index : best) {
+            boolean mostSpecific = true;
+            for (int other : best) {
+                Class<?>[] a = signatures.get(index), b = signatures.get(other);
+                if (a.length != b.length) { mostSpecific = false; break; }
+                for (int j = 0; j < a.length; j++) {
+                    if (!b[j].isAssignableFrom(a[j])) { mostSpecific = false; break; }
+                }
+                if (!mostSpecific) break;
+            }
+            if (mostSpecific) return index;
+        }
+        List<String> choices = new ArrayList<>();
+        for (int index : best) choices.add(Arrays.toString(signatures.get(index)));
+        throw new IllegalArgumentException("Ambiguous Java overload for " + name + ": " + choices + "; use .overload(*types)");
     }
 
     // --- reflection helpers ----------------------------------------------------
@@ -192,8 +230,8 @@ final class Dispatcher {
             if (a == Integer.class || a == Short.class || a == Byte.class) {
                 if (formal == int.class    || formal == Integer.class)  return 3;
                 if (formal == long.class   || formal == Long.class)     return 2;
-                if (formal == short.class  || formal == Short.class)    return 2;
-                if (formal == byte.class   || formal == Byte.class)     return 2;
+                if (formal == short.class  || formal == Short.class)    return 1;
+                if (formal == byte.class   || formal == Byte.class)     return 1;
                 if (formal == double.class || formal == Double.class)   return 2;
                 if (formal == float.class  || formal == Float.class)    return 2;
             }
@@ -219,6 +257,10 @@ final class Dispatcher {
         }
 
         if (arg instanceof Boolean && (formal == boolean.class || formal == Boolean.class)) return 3;
+        if (arg instanceof Character) {
+            if (formal == char.class || formal == Character.class) return 3;
+            if (formal == int.class || formal == long.class || formal == float.class || formal == double.class) return 2;
+        }
 
         return -1;
     }
@@ -239,6 +281,15 @@ final class Dispatcher {
             if (obj.has("__callback")) {
                 if (callbacks == null) throw new IllegalStateException("Callbacks unavailable");
                 return callbacks.create(obj.getString("__callback"), obj.getString("interface"));
+            }
+            if (obj.has("__map")) {
+                Map<Object, Object> out = new LinkedHashMap<>();
+                JSONArray entries = obj.getJSONArray("__map");
+                for (int i = 0; i < entries.length(); i++) {
+                    JSONArray entry = entries.getJSONArray(i);
+                    out.put(decode(entry.get(0)), decode(entry.get(1)));
+                }
+                return out;
             }
             Map<String, Object> out = new LinkedHashMap<>();
             for (String key : obj.keySet()) out.put(key, decode(obj.get(key)));
@@ -294,7 +345,10 @@ final class Dispatcher {
     }
 
     static Object coerceOne(Class<?> target, Object v) {
-        if (v == null) return null;
+        if (v == null) {
+            if (target.isPrimitive()) throw new IllegalArgumentException("null cannot be assigned to " + target.getName());
+            return null;
+        }
         if (target.isInstance(v)) return v;
         if (target.isArray() && v instanceof List<?>) {
             List<?> list = (List<?>)v;
@@ -305,6 +359,13 @@ final class Dispatcher {
         if (target == Set.class && v instanceof List<?>) return new LinkedHashSet<>((List<?>)v);
         if (target.isEnum() && v instanceof String) return enumValue(target, (String)v);
         if ((target == char.class || target == Character.class) && v instanceof String && ((String)v).length() == 1) return ((String)v).charAt(0);
+        if (v instanceof Character) {
+            int code = (Character)v;
+            if (target == int.class) return code;
+            if (target == long.class) return (long)code;
+            if (target == float.class) return (float)code;
+            if (target == double.class) return (double)code;
+        }
         if (v instanceof Number) {
             Number n = (Number) v;
             if (target == int.class    || target == Integer.class) return n.intValue();
@@ -314,7 +375,9 @@ final class Dispatcher {
             if (target == short.class  || target == Short.class)   return n.shortValue();
             if (target == byte.class   || target == Byte.class)    return n.byteValue();
         }
-        return v;
+        if (target == boolean.class && v instanceof Boolean) return v;
+        if (target == char.class && v instanceof Character) return v;
+        throw new IllegalArgumentException("Cannot assign " + v.getClass().getName() + " to " + target.getName());
     }
 
 

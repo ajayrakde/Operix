@@ -19,6 +19,11 @@ class RecordingBridge(Bridge):
         self.result = None
 
     def _request(self, payload):
+        if 'resolve' in payload:
+            # This transport fake does not implement Java's type graph. Real JVM
+            # tests cover resolution; choose the string candidate used here.
+            return next((i for i, candidate in enumerate(payload['candidates'])
+                        if candidate['parameter_types'] == ['java.lang.String']), 0)
         # Exercise actual JSON encoding, not merely the in-memory request shape.
         self.requests.append(json.loads(json.dumps(payload)))
         return self.result
@@ -133,10 +138,10 @@ def test_cross_bridge_arguments_are_rejected_before_request(bridge):
     assert bridge.requests == []
 
 
-def test_raw_ref_dictionaries_cannot_bypass_bridge_ownership(bridge):
-    with pytest.raises(ValueError, match='raw __ref'):
-        bridge.call('screen', 'find', [{'__ref': 'another-jvm-object'}])
-    assert bridge.requests == []
+def test_raw_ref_dictionary_is_map_data_and_cannot_forge_reference(bridge):
+    assert _encode({'__ref': 'another-jvm-object'}, bridge) == {
+        '__map': [['__ref', 'another-jvm-object']],
+    }
 
 
 def test_live_typed_alias_is_not_released_when_other_alias_is_deleted(bridge):

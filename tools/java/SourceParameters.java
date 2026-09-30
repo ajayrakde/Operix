@@ -46,7 +46,25 @@ public final class SourceParameters {
                     }
                     JSONArray members = result.optJSONArray(owner);
                     if (members == null) { members = new JSONArray(); result.put(owner, members); }
-                    members.put(new JSONObject().put("name", name).put("parameters", parameters));
+                    final boolean[] nullable = {false};
+                    final JSONArray delegates = new JSONArray();
+                    new TreeScanner<Void, Void>() {
+                        public Void visitReturn(ReturnTree node, Void unused) {
+                            ExpressionTree expression = node.getExpression();
+                            if (expression != null && expression.getKind() == Tree.Kind.NULL_LITERAL) nullable[0] = true;
+                            if (expression instanceof MethodInvocationTree) {
+                                MethodInvocationTree call = (MethodInvocationTree)expression;
+                                ExpressionTree select = call.getMethodSelect();
+                                if (select instanceof IdentifierTree) delegates.put(new JSONObject()
+                                    .put("name", select.toString()).put("arity", call.getArguments().size()));
+                            }
+                            return null;
+                        }
+                        public Void visitLambdaExpression(LambdaExpressionTree node, Void unused) { return null; }
+                        public Void visitClass(ClassTree node, Void unused) { return null; }
+                    }.scan(method.getBody(), null);
+                    members.put(new JSONObject().put("name", name).put("parameters", parameters)
+                        .put("nullable_return", nullable[0]).put("return_calls", delegates));
                     // Local/anonymous classes aren't part of the public API inventory.
                     return null;
                 }

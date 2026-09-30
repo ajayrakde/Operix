@@ -87,7 +87,7 @@ Java interface callbacks accept `JavaCallback(interface_name, handler)` and
 observer methods accept a Python function directly. Arrays/collections become
 Python sequences; maps become dictionaries; Java iterators support iteration.
 
-This distribution uses the matching 1.1.0 JVM bridge from `ajayrakde/Operix`.
+This distribution uses the matching 1.1.1 JVM bridge from `ajayrakde/Operix`.
 Do not mix it with the older upstream bridge. It occupies the same `oculix` import
 namespace as upstream, so install only one of the two distributions in a virtual
 environment. See [implementation and validation](https://github.com/ajayrakde/Operix/blob/python/java-api-parity/docs/python-api-parity.md).

@@ -60,6 +60,11 @@ jobs:
           python -m build python
           python -m twine check python/dist/*
           python tools/verify_python_wheel.py
+      - name: Validate packaged autocomplete and nullable type hints
+        run: |
+          python -m pip install pyright==1.1.414
+          python -m pip install --force-reinstall python/dist/oculix_operix-1.1.1-py3-none-any.whl
+          python tools/verify_python_typing.py
       - name: Check Java API inventory and explicit wrapper coverage
         run: python tools/inventory_java_api.py --check
 
@@ -90,7 +95,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view jvm-bridge-1.1.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          if gh release view jvm-bridge-1.1.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'exists=true' >> "$GITHUB_OUTPUT"
           else
             echo 'exists=false' >> "$GITHUB_OUTPUT"
@@ -99,16 +104,16 @@ jobs:
         if: steps.tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: jvm-bridge-1.1.0
+          tag_name: jvm-bridge-1.1.1
           target_commitish: ${{ github.sha }}
-          name: Operix Python API parity 1.1.0
+          name: Operix Python API parity 1.1.1
           body: |
-            Complete generated Python method/argument surface for Oculix 4.0.0.
+            Java runtime overload checks and conservative Python typing for Oculix 4.0.0.
             Validated Linux and Windows OCR, desktop capture/search/input,
             background callbacks and clean wheel installation.
             Distribution name: oculix-operix. Python import: oculix.
           files: |
-            jvm-bridge/target/operix-jvm-bridge-1.1.0.jar
+            jvm-bridge/target/operix-jvm-bridge-1.1.1.jar
             python/dist/*
       - name: Verify automatic fork JAR download and installed wheel OCR
         run: python tools/verify_python_wheel.py --download
