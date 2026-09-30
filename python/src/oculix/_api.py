@@ -64,6 +64,7 @@ def _score(value, formal):
         if formal == 'java.lang.CharSequence': return 10
         if formal in {'char','java.lang.Character'}: return 8 if len(value) == 1 else -1
         return 5 if _SCHEMA.get(formal, {}).get('enum') else -1
+    if isinstance(value, (bytes, bytearray)) and formal == 'byte[]': return 12
     if isinstance(value, (list, tuple, bytes, bytearray)):
         if formal.endswith('[]'):
             scores = [_score(v, formal[:-2]) for v in value]
@@ -177,6 +178,7 @@ class JavaField:
         self.set(type(instance), instance, value)
     def set(self, owner, instance, value):
         if self.field['final']: raise AttributeError('Java field is final: ' + self.field['name'])
+        if _score(value, self.field['type']) < 0: raise TypeError('Value does not match Java field type ' + self.field['type'])
         bridge = instance._remote._bridge if instance is not None else _default_bridge()
         from ._bridge import _encode
         req = {'class': owner.JAVA_CLASS, 'field': self.field['name'], 'value': _encode(value, bridge)}

@@ -28,7 +28,7 @@ BRIDGE_JAR_URL = (
     "https://github.com/ajayrakde/Operix/releases/download/"
     f"jvm-bridge-{BRIDGE_VERSION}/{BRIDGE_JAR_NAME}"
 )
-JAR_DIR = Path(os.path.expanduser("~/.oculix/lib"))
+JAR_DIR = Path(os.path.expanduser("~/.oculix/lib/ajayrakde-operix"))
 
 
 def _ensure_jar() -> Path:
