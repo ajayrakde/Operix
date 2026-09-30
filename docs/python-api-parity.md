@@ -59,8 +59,10 @@ its built JVM bridge. Release validation passed automatic JAR download from
 this fork and OCR from a fresh wheel installation.
 
 The [1.1.0 GitHub release](https://github.com/ajayrakde/Operix/releases/tag/jvm-bridge-1.1.0)
-contains the wheel, sdist and JVM bridge. PyPI publication was skipped because the
-repository has no `PYPI_API_TOKEN` configured for `oculix-operix`.
+contains the wheel, sdist and JVM bridge.
+[oculix-operix 1.1.0 is published on PyPI](https://pypi.org/project/oculix-operix/1.1.0/).
+A clean installation from PyPI passed typed API and real OCR validation.
+Install with `python -m pip install oculix-operix==1.1.0`; imports remain `oculix`.
 
 ## Reproduce
 
