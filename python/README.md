@@ -57,3 +57,28 @@ def test_addition(calc):
 ## License
 
 MIT
+
+## Java API parity work
+
+Known Oculix results now return their Python types: for example, `find()` and
+`findText()` return `Match`, and `getTarget()` returns `Location`. Python wrappers
+can be passed directly as Java method arguments. Java object identity is preserved
+across returned references and chained calls.
+
+```python
+from oculix import Screen, Pattern, Match, OCR
+
+screen = Screen()
+match = screen.find(Pattern("button.png").similar(0.8))
+assert isinstance(match, Match)
+match.click()
+
+options = OCR.globalOptions()
+text = OCR.readText("button.png", options)
+```
+
+`exists()` now returns `Match` or `None` to match Java. Boolean checks such as
+`if screen.exists("button.png"):` continue to work.
+
+Full explicit method and overload coverage is in progress. See
+[the implementation status](../docs/python-api-parity.md) for scope and remaining work.

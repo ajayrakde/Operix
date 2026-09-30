@@ -4,40 +4,43 @@
     >>> Screen().click("button.png")
 """
 
-from oculix._bridge import Bridge, BridgeError, RemoteObject, default_bridge
+from oculix._bridge import (
+    Bridge, BridgeError, RemoteObject, RemoteWrapper, default_bridge, register_wrapper,
+)
 
 __version__ = "1.0.0"
+_UNSET = object()
 __all__ = [
     "Bridge", "BridgeError", "RemoteObject", "default_bridge",
-    "Screen", "Region", "Pattern", "Match", "App",
+    "Screen", "Region", "Pattern", "Match", "Location", "Image", "ScreenImage", "App",
     "VNCScreen", "ADBScreen", "SSHTunnel",
-    "PaddleOCREngine", "OCR", "Key", "Settings",
+    "PaddleOCREngine", "PaddleOCRClient", "TesseractEngine", "OCR", "Key", "Settings",
 ]
 
 
 # --- thin Pythonic wrappers around the most-used Oculix classes -------------
 #
-# Each class is a one-liner that delegates everything to the bridge. Method
+# Explicit wrappers delegate calls to the shared bridge. Method
 # names track the Java side (camelCase) so users can cross-reference the
 # Sikuli/OculiX docs without translation.
 
-class _OculixClass:
-    """Base for explicit class wrappers — gives autocomplete and type hints."""
+class _OculixClass(RemoteWrapper):
+    """Base for explicit wrappers registered by their Java runtime class."""
 
     JAVA_CLASS: str = ""
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        java_class = cls.__dict__.get("JAVA_CLASS")
+        if java_class:
+            register_wrapper(java_class, cls)
+
     def __init__(self, *args):
-        self._remote = default_bridge().create(self.JAVA_CLASS, list(args))
-
-    def _call(self, method, *args):
-        return self._remote._call(method, *args)
-
-    @classmethod
-    def _wrap(cls, remote: RemoteObject) -> "_OculixClass":
-        """Build an instance directly from an existing RemoteObject (no JVM ctor call)."""
-        instance = cls.__new__(cls)
-        instance._remote = remote
-        return instance
+        bridge = default_bridge()
+        result = bridge.create(self.JAVA_CLASS, list(args))
+        self._remote = result._remote if isinstance(result, RemoteWrapper) else result
+        # Constructor results must intern the public instance, not a temporary facade.
+        bridge._cache[self._remote._ref] = self
 
 
 # --- Region: geometry + mouse + keyboard + search ---------------------------
@@ -71,10 +74,13 @@ class Region(_OculixClass):
     def wait(self, target, timeout: float = 10.0): return self._call("wait", target, float(timeout))
     def waitVanish(self, target, timeout: float = 10.0): return self._call("waitVanish", target, float(timeout))
     def exists(self, target, timeout: float = 3.0):
-        return self._call("exists", target, float(timeout)) is not None
+        return self._call("exists", target, float(timeout))
     def getLastMatch(self): return self._call("getLastMatch")
 
     # OCR
+    def findText(self, text: str) -> "Match":
+        return self._call("findText", text)
+
     def text(self):      return self._call("text")
     def textLines(self): return self._call("textLines")
     def textWords(self): return self._call("textWords")
@@ -154,6 +160,21 @@ class Match(Region):
     def getScore(self):  return self._call("getScore")
     def getTarget(self): return self._call("getTarget")
     def getIndex(self):  return self._call("getIndex")
+
+
+class Location(_OculixClass):
+    JAVA_CLASS = "org.sikuli.script.Location"
+
+    def getX(self): return self._call("getX")
+    def getY(self): return self._call("getY")
+
+
+class Image(_OculixClass):
+    JAVA_CLASS = "org.sikuli.script.Image"
+
+
+class ScreenImage(_OculixClass):
+    JAVA_CLASS = "org.sikuli.script.ScreenImage"
 
 
 # --- App --------------------------------------------------------------------
@@ -239,12 +260,31 @@ class PaddleOCREngine(_OculixClass):
         return PaddleOCREngine._wrap(result)
 
 
+class PaddleOCRClient(_OculixClass):
+    JAVA_CLASS = "com.sikulix.ocr.PaddleOCRClient"
+
+
+class TesseractEngine(_OculixClass):
+    JAVA_CLASS = "com.sikulix.ocr.TesseractEngine"
+
+
+class _OCROptions(_OculixClass):
+    JAVA_CLASS = "org.sikuli.script.OCR$Options"
+
+
 class OCR:
     """Tesseract-based OCR (``org.sikuli.script.OCR``) — fully static."""
     JAVA_CLASS = "org.sikuli.script.OCR"
+    Options = _OCROptions
 
     @staticmethod
-    def readText(target):  return default_bridge().call_static(OCR.JAVA_CLASS, "readText", [target])
+    def globalOptions():
+        return default_bridge().call_static(OCR.JAVA_CLASS, "globalOptions", [])
+
+    @staticmethod
+    def readText(target, options=_UNSET):
+        args = [target] if options is _UNSET else [target, options]
+        return default_bridge().call_static(OCR.JAVA_CLASS, "readText", args)
     @staticmethod
     def readLine(target):  return default_bridge().call_static(OCR.JAVA_CLASS, "readLine", [target])
     @staticmethod

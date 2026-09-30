@@ -16,7 +16,7 @@ import threading
 import urllib.request
 import weakref
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, Type
 
 # --- bridge JAR distribution -------------------------------------------------
 
@@ -61,8 +61,8 @@ class Bridge:
         self._lock = threading.Lock()
         self._next_id = 0
         # Python-side identity dedup: same Java ref always yields the same
-        # RemoteObject so __del__ doesn't kill a ref that's still in use.
-        self._cache: "weakref.WeakValueDictionary[str, RemoteObject]" = (
+        # Python object so __del__ doesn't kill a ref that's still in use.
+        self._cache: "weakref.WeakValueDictionary[str, Any]" = (
             weakref.WeakValueDictionary())
 
     def start(self) -> None:
@@ -124,18 +124,18 @@ class Bridge:
 
     # --- public RPC operations ----------------------------------------------
 
-    def create(self, classname: str, args: list) -> "RemoteObject":
-        result = self._request({"class": classname, "args": _encode_args(args)})
+    def create(self, classname: str, args: list) -> Any:
+        result = self._request({"class": classname, "args": _encode_args(args, self)})
         return _decode(self, result)
 
     def call(self, ref: str, method: str, args: list) -> Any:
-        result = self._request({"ref": ref, "method": method, "args": _encode_args(args)})
+        result = self._request({"ref": ref, "method": method, "args": _encode_args(args, self)})
         return _decode(self, result)
 
     def call_static(self, classname: str, method: str, args: list) -> Any:
         result = self._request({
             "class": classname, "method": method,
-            "static": True, "args": _encode_args(args),
+            "static": True, "args": _encode_args(args, self),
         })
         return _decode(self, result)
 
@@ -148,6 +148,37 @@ class Bridge:
 
 
 # --- value codec -------------------------------------------------------------
+
+_WRAPPER_TYPES = {}
+
+
+def register_wrapper(java_class: str, wrapper: Type["RemoteWrapper"]) -> None:
+    """Register the Python result type for an exact Java runtime class."""
+    _WRAPPER_TYPES[java_class] = wrapper
+
+
+class RemoteWrapper:
+    """Typed facade whose RemoteObject owns the Java reference lifetime."""
+
+    def _call(self, method: str, *args) -> Any:
+        return self._remote._call(method, *args)
+
+    def __getattr__(self, name: str):
+        if name.startswith("_"):
+            raise AttributeError(name)
+        # Keep existing Java methods callable while explicit signatures are added.
+        return getattr(self._remote, name)
+
+    @classmethod
+    def _wrap(cls, remote):
+        if isinstance(remote, cls):
+            return remote
+        if not isinstance(remote, RemoteObject):
+            raise TypeError("Expected a Java object reference")
+        instance = cls.__new__(cls)
+        instance._remote = remote
+        return instance
+
 
 class RemoteObject:
     """Opaque handle to a Java object held by the JVM bridge."""
@@ -189,13 +220,23 @@ class RemoteObject:
             pass
 
 
-def _encode_args(args: list) -> list:
-    return [_encode(a) for a in args]
+def _encode_args(args: list, bridge: Optional[Bridge] = None) -> list:
+    return [_encode(a, bridge) for a in args]
 
 
-def _encode(v: Any) -> Any:
+def _encode(v: Any, bridge: Optional[Bridge] = None) -> Any:
+    if isinstance(v, RemoteWrapper):
+        v = v._remote
     if isinstance(v, RemoteObject):
+        if bridge is not None and v._bridge is not bridge:
+            raise ValueError("Cannot pass a Java object to a different JVM bridge")
         return {"__ref": v._ref}
+    if isinstance(v, (list, tuple)):
+        return [_encode(item, bridge) for item in v]
+    if isinstance(v, dict):
+        if "__ref" in v:
+            raise ValueError("Pass a Java wrapper, not a raw __ref dictionary")
+        return {key: _encode(item, bridge) for key, item in v.items()}
     return v
 
 
@@ -205,9 +246,15 @@ def _decode(bridge: Bridge, v: Any) -> Any:
         cached = bridge._cache.get(ref)
         if cached is not None:
             return cached
-        obj = RemoteObject(bridge, ref, v.get("__class", "?"))
+        remote = RemoteObject(bridge, ref, v.get("__class", "?"))
+        wrapper = _WRAPPER_TYPES.get(remote._class)
+        obj = wrapper._wrap(remote) if wrapper is not None else remote
         bridge._cache[ref] = obj
         return obj
+    if isinstance(v, list):
+        return [_decode(bridge, item) for item in v]
+    if isinstance(v, dict):
+        return {key: _decode(bridge, item) for key, item in v.items()}
     return v
 
 

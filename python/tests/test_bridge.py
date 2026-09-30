@@ -15,7 +15,7 @@ import pytest
 from oculix._bridge import Bridge, BridgeError, RemoteObject
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge.jar"
+LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.0.0.jar"
 
 
 def _java_available() -> bool:
