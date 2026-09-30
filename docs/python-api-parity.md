@@ -48,15 +48,19 @@ an older system Tesseract. Cold and warm native-cache checks pass locally.
 
 CI additionally validates a real Swing desktop: capture, OCR text search, image
 search, click, keyboard input, clipboard paste and background observation. These
-checks require a graphical session; Linux CI uses Xvfb. Check the latest workflow
-run for the result of those desktop tests. VNC/ADB/SSH endpoints, every OCR language
+checks passed on Linux (Xvfb) and Windows Server 2025 in
+[release validation run 36785762319](https://github.com/ajayrakde/Operix/actions/runs/36785762319). VNC/ADB/SSH endpoints, every OCR language
 and macOS have not been separately exercised; declaration coverage does not mean
 that every Java method has a runtime test.
 
 The wheel and sdist build and pass package metadata checks. A clean wheel install
 outside the checkout loads the full generated API and reads the OCR fixture via
-its built JVM bridge. Release validation also checks automatic JAR download from
-this fork. PyPI publication requires publishing access for `oculix-operix`.
+its built JVM bridge. Release validation passed automatic JAR download from
+this fork and OCR from a fresh wheel installation.
+
+The [1.1.0 GitHub release](https://github.com/ajayrakde/Operix/releases/tag/jvm-bridge-1.1.0)
+contains the wheel, sdist and JVM bridge. PyPI publication was skipped because the
+repository has no `PYPI_API_TOKEN` configured for `oculix-operix`.
 
 ## Reproduce
 
