@@ -33,13 +33,13 @@ not a substitute for explicit signatures and autocomplete.
    the JVM bridge, with tests for overloaded calls and nested references.
 5. Complete OCR options, engines, text search and results. Match actual Java
    signatures rather than older example documentation.
-6. Finish actual desktop and native OCR validation. The headless JVM tests and
-   reproducible API coverage check are now in place.
+6. Finish desktop and Windows/macOS OCR validation. Linux native OCR, headless
+   JVM tests and the reproducible API coverage check are now in place.
 
 The recursive Python codec does not yet convert JSON containers into Java
 collections or arrays. Unknown Java classes still use the generic proxy.
 The implementation establishes typed core objects and validates them against Java;
-it does not claim complete API parity or successful desktop/native OCR validation.
+it does not claim complete API parity or successful desktop/Windows/macOS OCR validation.
 
 ## Tests
 
@@ -53,9 +53,10 @@ require Java and `jvm-bridge/target/operix-jvm-bridge-1.0.0.jar`; build with Mav
 
 ## JVM validation and API inventory
 
-- 41 Python tests pass, including 12 actual JVM integration tests.
+- 43 Python tests pass with native OCR enabled, including actual JVM integration tests.
 - 11 Java dispatcher/server tests pass.
-- Desktop and native OCR tests are explicit opt-in checks (2 skipped by default).
+- Native OCR checks run in Linux CI with `OCULIX_OCR_TESTS=1`.
+- Desktop checks remain opt-in and require a graphical runtime.
 - 211 public Java types and 3,168 distinct public method definitions were reflected
   without initializing classes; no classes were unavailable. Per-class inventories
   preserve inherited overloads and public constructors/fields.
@@ -67,10 +68,16 @@ require Java and `jvm-bridge/target/operix-jvm-bridge-1.0.0.jar`; build with Mav
   `InvocationTargetException`. This improvement requires building the fork's bridge;
   the upstream released 1.0.0 JAR still has the old error behavior.
 
-The native OCR smoke test was attempted and failed on this Linux runtime. Direct
-Java execution confirms JNA selects the system Tesseract 5.0.3 library, missing
-`TessBaseAPIGetPAGEText`. Typed OCR options and argument conversion pass; image-text
-recognition remains blocked by native library loading. No Windows OCR claim is made.
+Native OCR now reads the fixture correctly with and without explicit options on
+Linux, including hosts with an older system Tesseract. The bridge bootstraps the
+bundled Tesseract/Leptonica pair before Oculix initializes: it extracts exact
+unversioned JNA names into a bridge-specific cache, loads Leptonica with
+`RTLD_GLOBAL` to satisfy the older payload's broken `$ORIGIN` RUNPATH, then verifies
+that Tesseract resolves to that cache and reports version 5.5. The glibc tier and
+architecture select the matching bundled resources. No system library installation
+or `LD_LIBRARY_PATH` modification is needed. Windows/macOS loading is unchanged;
+this fix does not establish Windows/macOS OCR validation. The upstream released
+bridge does not include this fix; build this branch to use it.
 
 The `Region.virtual()` check was also attempted and rejected by Oculix in the
 headless runtime. A real graphical desktop is required for that test.

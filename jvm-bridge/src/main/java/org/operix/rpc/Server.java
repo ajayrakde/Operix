@@ -51,6 +51,7 @@ public final class Server {
         PrintStream rpcOut = System.out;
         System.setOut(System.err);
 
+        OcrNativeBootstrap.initialize();
         new Server(rpcOut).run(System.in);
     }
 

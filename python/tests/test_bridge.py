@@ -150,9 +150,17 @@ def test_invoked_java_error_exposes_cause(bridge):
 
 
 @pytest.mark.skipif(os.environ.get('OCULIX_OCR_TESTS') != '1', reason='Opt-in native OCR smoke test; set OCULIX_OCR_TESTS=1')
-def test_real_ocr_image_read(bridge):
+@pytest.mark.parametrize("with_options", [False, True])
+def test_real_ocr_image_read(bridge, with_options):
     options = bridge.create(OCR.Options.JAVA_CLASS, [])
     options.language('eng').psm(7)
     image = str(Path(__file__).parent / 'fixtures/ocr-submit.png')
-    text = bridge.call_static(OCR.JAVA_CLASS, 'readText', [image, options])
+    args = [image, options] if with_options else [image]
+    text = bridge.call_static(OCR.JAVA_CLASS, 'readText', args)
     assert 'Submit 12345' in text
+    # Ensure this is the bundled engine, even with system Tesseract installed.
+    if bridge.call_static('java.lang.System', 'getProperty', ['os.name']) == 'Linux':
+        library = bridge.call_static('com.sun.jna.NativeLibrary', 'getInstance', ['tesseract'])
+        loaded_path = library._call('getFile')._call('getAbsolutePath')
+        assert '/operix/ocr-oculix-4.0.0/' in loaded_path
+        assert loaded_path.endswith('/libtesseract.so')
