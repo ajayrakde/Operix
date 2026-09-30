@@ -58,6 +58,8 @@ public final class Server {
         System.setOut(System.err);
 
         OcrNativeBootstrap.initialize();
+        // Standalone bridge startup does not run the IDE initialization path.
+        org.sikuli.support.Commons.setTempFolder();
         new Server(rpcOut).run(System.in);
     }
 

@@ -46,6 +46,12 @@ jobs:
           DISPLAY: ':99'
           OCULIX_DESKTOP_TESTS: '1'
         run: python -m pytest python/tests/test_desktop.py -q
+      - name: Save desktop diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-${{ matrix.os }}
+          path: test-artifacts/
       - name: Check generated Python methods and overload stubs
         run: python tools/generate_python_api.py --check
       - name: Build and check Python distributions

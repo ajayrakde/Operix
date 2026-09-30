@@ -20,6 +20,7 @@ public final class DesktopFixture {
         SwingUtilities.invokeAndWait(() -> {
             frame = new JFrame("Operix desktop validation");
             frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            frame.setUndecorated(true);
             JPanel content = new JPanel(null);
             content.setBackground(Color.WHITE);
             content.setPreferredSize(new Dimension(850, 320));
@@ -39,10 +40,16 @@ public final class DesktopFixture {
             frame.setContentPane(content);
             frame.pack(); frame.setLocation(80, 80); frame.setAlwaysOnTop(true); frame.setVisible(true);
         });
+        Thread.sleep(700); // Wait for native map/configure events before reading screen coordinates.
         new Robot().waitForIdle();
         SwingUtilities.invokeAndWait(() -> System.out.println(new JSONObject()
             .put("region", rectangle(frame.getContentPane())).put("label", rectangle(label))
             .put("field", rectangle(field)).put("button", rectangle(button))));
+        if (args.length > 0) {
+            File folder = new File(args[0]); folder.mkdirs();
+            javax.imageio.ImageIO.write(new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize())),
+                "png", new File(folder, "fixture-desktop.png"));
+        }
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String command;
         while ((command = reader.readLine()) != null) {

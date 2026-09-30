@@ -17,7 +17,7 @@ pytestmark = pytest.mark.skipif(os.environ.get('OCULIX_DESKTOP_TESTS') != '1', r
 @pytest.fixture
 def desktop(monkeypatch):
     proc = subprocess.Popen(['java', '-cp', os.pathsep.join([str(JAR), str(ROOT / 'jvm-bridge/target/test-classes')]),
-                             'org.operix.rpc.DesktopFixture'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             'org.operix.rpc.DesktopFixture', str(ROOT / 'test-artifacts')], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                             text=True, encoding='utf-8')
     bridge = Bridge(jar_path=JAR)
     monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
@@ -28,6 +28,8 @@ def desktop(monkeypatch):
         time.sleep(0.5)  # Allow the compositor to paint the newly visible frame.
         yield bridge, proc, layout
     finally:
+        (ROOT / "test-artifacts").mkdir(exist_ok=True)
+        (ROOT / "test-artifacts/bridge-stderr.txt").write_text("\n".join(bridge._stderr_tail), encoding="utf-8")
         bridge.stop()
         if proc.poll() is None:
             proc.stdin.write('quit\n'); proc.stdin.flush()
