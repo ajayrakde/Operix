@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * same ref (identity-based interning) so chained calls like
  * {@code sb.append(x).append(y)} don't leak fresh refs on every step.
  *
- * Not thread-safe — the dispatcher loop is single-threaded over stdin.
+ * Synchronized for concurrent requests and callback threads.
  */
 final class ObjectRegistry {
 
@@ -18,7 +18,7 @@ final class ObjectRegistry {
     private final IdentityHashMap<Object, String> byObj = new IdentityHashMap<>();
     private final AtomicLong counter = new AtomicLong();
 
-    String register(Object obj) {
+    synchronized String register(Object obj) {
         String existing = byObj.get(obj);
         if (existing != null) return existing;
         String id = "o" + counter.incrementAndGet();
@@ -27,7 +27,7 @@ final class ObjectRegistry {
         return id;
     }
 
-    Object get(String id) {
+    synchronized Object get(String id) {
         Object o = byId.get(id);
         if (o == null) {
             throw new IllegalArgumentException("Unknown ref: " + id);
@@ -35,7 +35,7 @@ final class ObjectRegistry {
         return o;
     }
 
-    void release(String id) {
+    synchronized void release(String id) {
         Object o = byId.remove(id);
         if (o != null) byObj.remove(o);
     }

@@ -52,9 +52,10 @@ def test_known_runtime_class_returns_typed_wrapper(bridge, wrapper):
     assert _encode(value, bridge) == {'__ref': 'o1'}
 
 
-def test_unknown_class_keeps_generic_proxy(bridge):
+def test_external_class_gets_named_typed_proxy(bridge):
     value = _decode(bridge, ref('java.lang.StringBuilder'))
-    assert isinstance(value, RemoteObject)
+    assert isinstance(value, oculix.JavaObject)
+    assert value.JAVA_CLASS == "java.lang.StringBuilder"
     bridge.result = 3
     assert value.length() == 3
 
@@ -152,8 +153,8 @@ def test_live_typed_alias_is_not_released_when_other_alias_is_deleted(bridge):
 def test_typed_result_keeps_unwrapped_methods_directly_callable(bridge):
     image = _decode(bridge, ref(oculix.Image.JAVA_CLASS))
     bridge.result = 240
-    assert image.getWidth() == 240
-    assert bridge.requests[-1]['method'] == 'getWidth'
+    assert image.getW() == 240
+    assert bridge.requests[-1]['method'] == 'getW'
     with pytest.raises(AttributeError):
         getattr(image, '__getstate_missing__')
 

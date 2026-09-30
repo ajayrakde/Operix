@@ -1,113 +1,91 @@
 # Python / Oculix Java API parity
 
-Target: the Oculix **4.0.0** API currently pinned by `jvm-bridge/pom.xml`.
-The goal is the public Java API as-is: names, arguments, overloads, constructors,
-static methods, return types, inheritance and OCR. `_call` stays an internal
-implementation detail. Dynamic forwarding is an interim compatibility fallback,
-not a substitute for explicit signatures and autocomplete.
+Target: Oculix **4.0.0**, pinned by `jvm-bridge/pom.xml`.
+Fork distribution: **oculix-operix 1.1.0**; Python imports remain `oculix`.
 
-## First implementation
+## Implemented API
 
-- Registered Java runtime classes decode into typed Python wrappers.
-- `Match` keeps its `Region` inheritance.
-- Constructors, static factories and returned `this` references share identity.
-- A single underlying `RemoteObject` owns reference release, preventing a temporary
-  wrapper or a deleted alias from invalidating a live Java object.
-- Wrapper arguments are encoded as their Java references; passing objects between
-  JVM bridges raises an error before sending a request.
-- Core result types now include `Location`, `Image` and `ScreenImage`.
-- OCR result types include `OCR.Options`, `PaddleOCRClient` and `TesseractEngine`.
-- `Region.findText(text)` is explicit. `OCR.readText(target, options)` supports
-  both Java overloads, including explicitly supplied null options.
-- `Region.exists()` returns `Match` or `None`, replacing the previous Boolean
-  conversion. Existing truth checks still work; `is True` checks must change.
+- All 211 inventoried public Java types have registered, named Python facades.
+- All 13,574 public method overload occurrences (including inheritance, excluding
+  Object methods in the coverage count) have exact Java signature metadata. The
+  inventory contains 3,168 distinct method definitions. No method overloads are
+  missing from the generated surface.
+- All public constructors and fields are exposed. Static/instance placement,
+  public inheritance, nested types, enum constants, parameter types and varargs
+  are preserved. Unsupported older declarations were removed.
+- Generated `.pyi` declarations provide named arguments, overloads, return hints
+  and editor completion. The runtime binds against the same finite declaration
+  set rather than accepting arbitrary Oculix method names.
+- Published source declarations supplement binary parameter metadata. Fourteen
+  VNC declarations lack parameter names in the available source artifact and
+  preserve the binary names `arg0`, etc.; every argument and type is still present.
+  Java/Python reserved words get a trailing underscore, e.g. `Debug.is_`.
+- Exact signature requests resolve overloads in Java. For ambiguous null/reference
+  values, use `method.overload('java.type.Name', ...)(arguments)`.
+- Returned references preserve identity and typed wrappers; the raw RemoteObject
+  is an internal lifetime owner. External Java types receive named facades.
+- Python lists/tuples, dictionaries, primitive arrays, char, enums, collections,
+  nested references, varargs and Java iterators are supported. Collections/arrays
+  return Python sequences and maps return Python dictionaries. Cycles fall back
+  to Java references instead of recursing indefinitely.
+- Public static/instance fields read and write the actual Java field without a
+  stale constants cache; final fields reject assignment.
+- Java interface callbacks use `JavaCallback(interface, handler)`. Oculix observer
+  callbacks also accept Python functions or `JavaCallback(ObserverCallBack, handler)`.
+  The protocol supports background callbacks and callbacks making nested Java
+  calls; Python callback errors are available through `Bridge.callback_errors`.
 
-## Remaining work
+## Validation
 
-1. Use the committed Java inventory and coverage report to drive implementation.
-   Supplement missing source parameter names where the JAR lacks name metadata.
-2. Generate explicit Python signatures and overload type hints, with every Java
-   parameter preserved. Remove Python defaults that change Java overload behavior.
-3. Expand runtime-class registration, including Java subclasses and enum types.
-4. Support Java arrays, collections, iterators, enums, varargs and callbacks through
-   the JVM bridge, with tests for overloaded calls and nested references.
-5. Complete OCR options, engines, text search and results. Match actual Java
-   signatures rather than older example documentation.
-6. Finish desktop and macOS OCR validation. Linux/Windows native OCR, headless
-   JVM tests and the reproducible API coverage check are now in place.
+The local JVM/transport suite passes 50 tests, including exact overloads, typed
+identity, nested maps/arrays, enum and field access, iterator access and a callback
+that performs nested Java calls. Eleven Java dispatcher/server tests pass.
 
-The recursive Python codec does not yet convert JSON containers into Java
-collections or arrays. Unknown Java classes still use the generic proxy.
-The implementation establishes typed core objects and validates them against Java;
-it does not claim complete API parity or successful desktop/macOS OCR validation.
+Native image OCR passes with and without options on Linux and Windows Server 2025
+x64 using Java 17 / Python 3.12. Linux explicitly binds the bundled matching
+Tesseract/Leptonica pair; it verifies the loaded file and version rather than using
+an older system Tesseract. Cold and warm native-cache checks pass locally.
 
-## Tests
+CI additionally validates a real Swing desktop: capture, OCR text search, image
+search, click, keyboard input, clipboard paste and background observation. These
+checks require a graphical session; Linux CI uses Xvfb. Check the latest workflow
+run for the result of those desktop tests. VNC/ADB/SSH endpoints, every OCR language
+and macOS have not been separately exercised; declaration coverage does not mean
+that every Java method has a runtime test.
 
-```sh
-PYTHONPATH=python/src python -m pytest python/tests -q
-```
+The wheel and sdist build and pass package metadata checks. A clean wheel install
+outside the checkout loads the full generated API and reads the OCR fixture via
+its built JVM bridge. Release validation also checks automatic JAR download from
+this fork. PyPI publication requires publishing access for `oculix-operix`.
 
-Transport-level tests use recorded JSON requests and test typed dispatch, ownership,
-GC, argument conversion and result identity without a desktop. JVM integration tests
-require Java and `jvm-bridge/target/operix-jvm-bridge-1.0.0.jar`; build with Maven first.
-
-## JVM validation and API inventory
-
-- 43 Python tests pass with native OCR enabled, including actual JVM integration tests.
-- 11 Java dispatcher/server tests pass.
-- Native OCR checks run in Linux and Windows CI with `OCULIX_OCR_TESTS=1`.
-- Desktop checks remain opt-in and require a graphical runtime.
-- 211 public Java types and 3,168 distinct public method definitions were reflected
-  without initializing classes; no classes were unavailable. Per-class inventories
-  preserve inherited overloads and public constructors/fields.
-- [Coverage report](python-api-coverage.md) distinguishes explicit names and arities
-  from semantic parity. Dynamic forwarding does not count as explicit coverage.
-- [Compressed machine manifest](java-api-4.0.0.json.gz) contains complete type and
-  overload metadata. Decompress with Python's `gzip` module to inspect it.
-- Reflection errors now expose the invoked Java exception rather than just
-  `InvocationTargetException`. This improvement requires building the fork's bridge;
-  the upstream released 1.0.0 JAR still has the old error behavior.
-
-Native OCR now reads the fixture correctly with and without explicit options on
-Linux, including hosts with an older system Tesseract. The bridge bootstraps the
-bundled Tesseract/Leptonica pair before Oculix initializes: it extracts exact
-unversioned JNA names into a bridge-specific cache, loads Leptonica with
-`RTLD_GLOBAL` to satisfy the older payload's broken `$ORIGIN` RUNPATH, then verifies
-that Tesseract resolves to that cache and reports version 5.5. The glibc tier and
-architecture select the matching bundled resources. No system library installation
-or `LD_LIBRARY_PATH` modification is needed. Windows/macOS loading is unchanged;
-Windows Server 2025 x64 CI with Java 17 and Python 3.12 also passes both real
-image-reading overloads, all 43 Python tests and 11 Java tests. Windows DLL loading
-required no change. Windows desktop capture/text-search and macOS OCR remain
-unverified. The upstream released
-bridge does not include this fix; build this branch to use it.
-
-The `Region.virtual()` check was also attempted and rejected by Oculix in the
-headless runtime. A real graphical desktop is required for that test.
-
-Rebuild and reproduce:
+## Reproduce
 
 ```sh
 cd jvm-bridge
 mvn -B package
 cd ..
-python -m pip install -e ./python pytest
-python -m pytest python/tests -q
+python -m pip install -e ./python pytest build twine
+OCULIX_OCR_TESTS=1 python -m pytest python/tests -q
 python tools/inventory_java_api.py --check
+python tools/generate_python_api.py --check
+python -m build python
+python -m twine check python/dist/*
+python tools/verify_python_wheel.py
 ```
 
-Regenerate coverage after wrapper changes:
+Set `OCULIX_DESKTOP_TESTS=1` and run `python/tests/test_desktop.py` on a graphical
+session. The source fixture is compiled into `jvm-bridge/target/test-classes`.
+Java 17+ is used for builds and inventory tooling. A JRE containing the compiler
+module can also compile helpers through Eclipse ECJ with `--compiler-jar`.
 
-```sh
-python tools/inventory_java_api.py
-```
+## Generation and coverage
 
-Java 17+ JDK is required for inventory generation. `--compiler-jar /path/to/ecj.jar`
-is an alternative for a JRE-only environment using Eclipse's Java compiler.
+[Coverage report](python-api-coverage.md) compares every exact generated overload
+with the binary inventory. [Machine inventory](java-api-4.0.0.json.gz) preserves
+constructors, fields, exception types and generic types.
 
-Opt-in runtime checks (fail on errors rather than hiding them):
-
-```sh
-OCULIX_OCR_TESTS=1 python -m pytest python/tests/test_bridge.py -k real_ocr_image_read -q
-OCULIX_DESKTOP_TESTS=1 python -m pytest python/tests/test_bridge.py -k virtual_region -q
-```
+`tools/java/SourceParameters.java` parses the published sources with javac's AST
+without dependency resolution. Its compressed output is committed as
+`tools/java-source-parameters.json.gz`. `tools/generate_python_api.py` combines
+source names with the binary inventory to generate the packaged runtime schema
+and complete overload stubs. CI fails if either generated artifact is stale.

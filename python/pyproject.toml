@@ -3,8 +3,8 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "oculix"
-version = "1.0.0"
+name = "oculix-operix"
+version = "1.1.0"
 description = "Visual automation for the real world — Python wrapper for OculiX"
 readme = "README.md"
 license = {text = "MIT"}
@@ -20,11 +20,14 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/oculix-org/Operix"
-Repository = "https://github.com/oculix-org/Operix"
+Homepage = "https://github.com/ajayrakde/Operix"
+Repository = "https://github.com/ajayrakde/Operix"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+oculix = ["_api_schema.json.gz", "py.typed", "**/*.pyi"]

@@ -5,12 +5,12 @@ Python wrapper for [OculiX](https://github.com/oculix-org/Oculix) — visual aut
 ## Install
 
 ```bash
-pip install oculix
+pip install oculix-operix
 ```
 
 Requirements: Python 3.8+, Java 11+ on `PATH` (Eclipse Temurin or Azul Zulu).
 
-The OculiX engine (~160 MB fat JAR) is downloaded on first use into `~/.oculix/lib/`.
+The OculiX engine (~200 MB fat JAR) is downloaded on first use into `~/.oculix/lib/`.
 
 ## Quickstart
 
@@ -58,27 +58,36 @@ def test_addition(calc):
 
 MIT
 
-## Java API parity work
+## Java API parity
 
-Known Oculix results now return their Python types: for example, `find()` and
-`findText()` return `Match`, and `getTarget()` returns `Location`. Python wrappers
-can be passed directly as Java method arguments. Java object identity is preserved
-across returned references and chained calls.
+This fork exposes the complete pinned Oculix 4.0.0 public method surface: 211
+public types with named Python methods, constructor/field access and every Java
+overload's arguments. `from oculix import Screen, OCR, Pattern` stays unchanged.
+Every class is also available through `oculix.java`; nested classes keep names
+such as `OCR.Options` and `OCR.PSM`.
 
 ```python
-from oculix import Screen, Pattern, Match, OCR
+from oculix import Screen, Pattern, Match, OCR, Location, JavaCallback, ObserverCallBack
 
 screen = Screen()
 match = screen.find(Pattern("button.png").similar(0.8))
 assert isinstance(match, Match)
 match.click()
+screen.type("hello", 0)
 
-options = OCR.globalOptions()
+options = OCR.Options().language("eng").psm(OCR.PSM.SINGLE_LINE)
 text = OCR.readText("button.png", options)
+
+# Ambiguous Java overloads can be selected explicitly.
+options.psm.overload("org.sikuli.script.OCR$PSM")("SINGLE_LINE")
 ```
 
-`exists()` now returns `Match` or `None` to match Java. Boolean checks such as
-`if screen.exists("button.png"):` continue to work.
+`exists()` returns `Match` or `None`, matching Java; truth checks continue to work.
+Java interface callbacks accept `JavaCallback(interface_name, handler)` and
+observer methods accept a Python function directly. Arrays/collections become
+Python sequences; maps become dictionaries; Java iterators support iteration.
 
-Full explicit method and overload coverage is in progress. See
-[the implementation status](../docs/python-api-parity.md) for scope and remaining work.
+This distribution uses the matching 1.1.0 JVM bridge from `ajayrakde/Operix`.
+Do not mix it with the older upstream bridge. It occupies the same `oculix` import
+namespace as upstream, so install only one of the two distributions in a virtual
+environment. See [implementation and validation](https://github.com/ajayrakde/Operix/blob/python/java-api-parity/docs/python-api-parity.md).

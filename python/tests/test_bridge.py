@@ -12,11 +12,11 @@ from pathlib import Path
 
 import pytest
 
-from oculix import Location, OCR, Pattern, Region
+from oculix import Location, OCR, Pattern, Region, JavaObject
 from oculix._bridge import Bridge, BridgeError, RemoteObject
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.0.0.jar"
+LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.1.0.jar"
 
 
 def _java_available() -> bool:
@@ -43,7 +43,7 @@ def bridge():
 
 def test_construct_and_call_static_jdk_class(bridge):
     sb = bridge.create("java.lang.StringBuilder", [])
-    assert isinstance(sb, RemoteObject)
+    assert isinstance(sb, JavaObject)
     assert sb._call("append", "hello ") is sb or sb._call("append", "hello ")._ref == sb._ref
     sb._call("append", "operix")
     assert sb._call("length") == 12
@@ -164,3 +164,53 @@ def test_real_ocr_image_read(bridge, with_options):
         loaded_path = library._call('getFile')._call('getAbsolutePath')
         assert '/operix/ocr-oculix-4.0.0/' in loaded_path
         assert loaded_path.endswith('/libtesseract.so')
+
+
+def test_arrays_collections_nested_references_and_char(bridge):
+    assert bridge.call_static('java.util.Arrays', 'toString', [[1, 2, 3]], parameter_types=['int[]']) == '[1, 2, 3]'
+    assert bridge.call_static('java.util.Collections', 'singletonList', [{'nested': [1, 2]}]) == [{'nested': [1, 2]}]
+    assert bridge.call_static('java.util.Collections', 'singletonMap', [3, 'three']) == {3: 'three'}
+    location = bridge.create(Location.JAVA_CLASS, [7, 8])
+    assert bridge.call_static('java.util.Collections', 'singletonList', [location]) == [location]
+    assert bridge.call_static('java.lang.Character', 'toUpperCase', ['a'], parameter_types=['char']) == 'A'
+    assert bridge.call_static('java.util.Arrays', 'asList', ['one', 'two'], parameter_types=['java.lang.Object[]']) == ['one', 'two']
+
+
+def test_exact_overload_enum_keywords_and_fields(bridge, monkeypatch):
+    import oculix
+    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    location = Location(x=0, y=20)
+    assert location.getX() == 0
+    location.x = 15
+    assert location.x == 15
+    options = OCR.Options()
+    enum = OCR.PSM.SINGLE_LINE
+    assert isinstance(enum, OCR.PSM)
+    assert enum.name() == 'SINGLE_LINE'
+    assert options.psm(enum).psm() == 7
+    assert options.psm.overload('org.sikuli.script.OCR$PSM')('SINGLE_LINE').psm() == 7
+    original = oculix.Settings.MoveMouseDelay
+    try:
+        oculix.Settings.MoveMouseDelay = 0.25
+        assert oculix.Settings.MoveMouseDelay == pytest.approx(0.25)
+    finally:
+        oculix.Settings.MoveMouseDelay = original
+
+
+def test_callbacks_can_make_nested_java_calls(bridge):
+    from oculix import JavaCallback
+    seen = []
+    def compare(a, b):
+        seen.append((a, b))
+        return bridge.call_static('java.lang.Integer', 'compare', [a, b])
+    stream = bridge.call_static('java.util.Arrays', 'stream', [[3, 1, 2]], parameter_types=['java.lang.Object[]'])
+    comparator = JavaCallback('java.util.Comparator', compare)
+    ordered = bridge.call(stream._ref, 'sorted', [comparator], parameter_types=['java.util.Comparator'])
+    assert ordered._call('toArray') == [1, 2, 3]
+    assert seen
+    assert bridge.callback_errors == ()
+
+
+def test_iterator_result_is_python_iterable(bridge):
+    stream = bridge.call_static('java.util.Arrays', 'stream', [[3, 1, 2]], parameter_types=['java.lang.Object[]'])
+    assert list(stream._call('iterator')) == [3, 1, 2]

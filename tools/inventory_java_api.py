@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'python/src'))
 import oculix
 from oculix._bridge import _WRAPPER_TYPES
+from oculix._api import JavaMethod
 
 
 def reflected_inventory(jar, compiler_jar):
@@ -49,6 +50,10 @@ def coverage(method, wrapper):
     member = python_member(wrapper, method['name'])
     if member is None:
         return 'missing'
+    if isinstance(member, JavaMethod):
+        expected = (method['static'], tuple(p['type'] for p in method['parameters']))
+        present = {(m['static'], tuple(p['type'] for p in m['parameters'])) for m in member.members}
+        return 'explicit_name_and_arity' if expected in present else 'signature_mismatch'
     is_static = isinstance(member, (staticmethod, classmethod))
     if is_static != method['static']:
         return 'static_mismatch'
@@ -85,7 +90,7 @@ def summarize(inventory):
             for parent in wrapper.__mro__:
                 python_names.update(name for name, value in parent.__dict__.items()
                                     if not name.startswith('_') and not inspect.isclass(value)
-                                    and (callable(value) or isinstance(value, (staticmethod, classmethod))))
+                                    and (callable(value) or isinstance(value, (staticmethod, classmethod, JavaMethod))))
         counts = {}
         for method in results:
             counts[method['coverage']] = counts.get(method['coverage'], 0) + 1
@@ -159,7 +164,7 @@ def report(rows, version):
     lines += ['## Unregistered public Java classes', '',
               'These classes still fall back to generic remote objects where reachable.', '']
     lines += ['- `' + r['class'] + '`' for r in rows if r['python_wrapper'] is None]
-    return '\n'.join(lines) + '\n'
+    return '\n'.join(lines).rstrip() + '\n'
 
 
 def normalized_manifest(inventory, version):

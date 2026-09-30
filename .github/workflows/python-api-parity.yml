@@ -38,5 +38,21 @@ jobs:
         env:
           OCULIX_OCR_TESTS: '1'
         run: python -m pytest python/tests -q
+      - name: Start Linux desktop
+        if: runner.os == 'Linux'
+        run: Xvfb :99 -screen 0 1280x1024x24 > /tmp/operix-xvfb.log 2>&1 &
+      - name: Validate real desktop capture, OCR, input and callbacks
+        env:
+          DISPLAY: ':99'
+          OCULIX_DESKTOP_TESTS: '1'
+        run: python -m pytest python/tests/test_desktop.py -q
+      - name: Check generated Python methods and overload stubs
+        run: python tools/generate_python_api.py --check
+      - name: Build and check Python distributions
+        run: |
+          python -m pip install build twine
+          python -m build python
+          python -m twine check python/dist/*
+          python tools/verify_python_wheel.py
       - name: Check Java API inventory and explicit wrapper coverage
         run: python tools/inventory_java_api.py --check
