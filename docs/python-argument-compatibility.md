@@ -64,3 +64,5 @@ The full existing Windows/Linux desktop and OCR checks also gate release.
 
 Method/signature coverage is complete for the pinned inventory. The regression
 suite is not an exhaustive proof for every Java value and method combination.
+
+Release 1.1.1 passed [Windows/Linux CI and publication checks](https://github.com/ajayrakde/Operix/actions/runs/36792760231).

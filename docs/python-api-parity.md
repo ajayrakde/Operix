@@ -37,9 +37,9 @@ Fork distribution: **oculix-operix 1.1.1**; Python imports remain `oculix`.
 
 ## Validation
 
-The JVM/transport suite covers exact overloads, typed
+The local JVM/transport suite passes 55 tests, covering exact overloads, typed
 identity, nested maps/arrays, enum and field access, iterator access and a callback
-that performs nested Java calls. Java dispatcher/server tests include direct Java/RPC compatibility comparisons.
+that performs nested Java calls. Fourteen Java dispatcher/server tests pass, including direct Java/RPC compatibility comparisons.
 
 Native image OCR passes with and without options on Linux and Windows Server 2025
 x64 using Java 17 / Python 3.12. Linux explicitly binds the bundled matching
@@ -49,7 +49,7 @@ an older system Tesseract. Cold and warm native-cache checks pass locally.
 CI additionally validates a real Swing desktop: capture, OCR text search, image
 search, click, keyboard input, clipboard paste and background observation. These
 checks passed on Linux (Xvfb) and Windows Server 2025 in
-[release validation run 36785762319](https://github.com/ajayrakde/Operix/actions/runs/36785762319). VNC/ADB/SSH endpoints, every OCR language
+[release validation run 36792760231](https://github.com/ajayrakde/Operix/actions/runs/36792760231). VNC/ADB/SSH endpoints, every OCR language
 and macOS have not been separately exercised; declaration coverage does not mean
 that every Java method has a runtime test.
 
@@ -58,11 +58,11 @@ outside the checkout loads the full generated API and reads the OCR fixture via
 its built JVM bridge. Release validation passed automatic JAR download from
 this fork and OCR from a fresh wheel installation.
 
-The [1.1.0 GitHub release](https://github.com/ajayrakde/Operix/releases/tag/jvm-bridge-1.1.0)
+The [1.1.1 GitHub release](https://github.com/ajayrakde/Operix/releases/tag/jvm-bridge-1.1.1)
 contains the wheel, sdist and JVM bridge.
-[oculix-operix 1.1.0 is published on PyPI](https://pypi.org/project/oculix-operix/1.1.0/).
+[oculix-operix 1.1.1 is published on PyPI](https://pypi.org/project/oculix-operix/1.1.1/).
 A clean installation from PyPI passed typed API and real OCR validation.
-Install with `python -m pip install oculix-operix==1.1.0`; imports remain `oculix`.
+Install with `python -m pip install oculix-operix==1.1.1`; imports remain `oculix`.
 
 ## Reproduce
 
