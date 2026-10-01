@@ -176,5 +176,7 @@ def test_ocr_read_text_selects_omitted_or_explicit_options(bridge):
     bridge.result = 'text'
     assert oculix.OCR.readText('image.png') == 'text'
     assert bridge.requests[-1]['args'] == ['image.png']
-    assert oculix.OCR.readText('image.png', None) == 'text'
+    with pytest.raises(TypeError, match='options.*must not be None'):
+        oculix.OCR.readText('image.png', None)
+    assert oculix.OCR.readLines('image.png', None) == 'text'
     assert bridge.requests[-1]['args'] == ['image.png', None]

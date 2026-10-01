@@ -47,6 +47,8 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: jvm-bridge-${{ steps.pom.outputs.version }}
+          prerelease: ${{ contains(steps.pom.outputs.version, 'b') || contains(steps.pom.outputs.version, 'rc') || contains(steps.pom.outputs.version, 'alpha') }}
+          make_latest: false
           name: jvm-bridge ${{ steps.pom.outputs.version }}
           body: |
             OculiX JVM bridge (fat JAR) for the Python / Node.js / .NET wrappers.

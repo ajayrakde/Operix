@@ -230,4 +230,25 @@ class DispatcherTest {
         assertThrows(IllegalArgumentException.class, () -> Dispatcher.coerceOne(int.class, null));
     }
 
+    @Test
+    void graphicsRuntimeSubclassUsesExportedPublicMethods() throws Exception {
+        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(10, 10,
+            java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D graphics = image.createGraphics();
+        JSONObject encoded = (JSONObject) dispatcher.encode(graphics);
+        assertTrue(encoded.getJSONArray("__types").toList().contains("java.awt.Graphics2D"));
+        String ref = encoded.getString("__ref");
+        try {
+            dispatcher.dispatch(new JSONObject().put("ref", ref).put("method", "setColor")
+                .put("parameter_types", new JSONArray().put("java.awt.Color"))
+                .put("args", new JSONArray().put(dispatcher.encode(java.awt.Color.RED))));
+            dispatcher.dispatch(new JSONObject().put("ref", ref).put("method", "fillRect")
+                .put("parameter_types", new JSONArray().put("int").put("int").put("int").put("int"))
+                .put("args", new JSONArray().put(0).put(0).put(10).put(10)));
+            assertEquals(java.awt.Color.RED.getRGB(), image.getRGB(2, 3));
+        } finally {
+            dispatcher.dispatch(new JSONObject().put("ref", ref).put("method", "dispose")
+                .put("parameter_types", new JSONArray()).put("args", new JSONArray()));
+        }
+    }
 }

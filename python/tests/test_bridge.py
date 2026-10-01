@@ -16,7 +16,7 @@ from oculix import Location, OCR, Pattern, Region, JavaObject
 from oculix._bridge import Bridge, BridgeError, RemoteObject
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.1.1.jar"
+LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.2.0b1.jar"
 
 
 def _java_available() -> bool:

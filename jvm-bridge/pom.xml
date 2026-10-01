@@ -7,7 +7,7 @@
 
     <groupId>org.operix</groupId>
     <artifactId>operix-jvm-bridge</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0b1</version>
     <packaging>jar</packaging>
 
     <name>Operix JVM Bridge</name>

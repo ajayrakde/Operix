@@ -35,8 +35,60 @@ def enrich(member, sources):
     if (member['declaring_class'], member['name']) in {
             ('org.sikuli.script.Element', 'getLastMatch'),
             ('org.sikuli.script.Element', 'getLastMatches'),
+            ('org.sikuli.script.Image', 'getURL'),
+            ('org.sikuli.script.Image', 'getLastSeen'),
+            ('org.sikuli.script.Pattern', 'getFileURL'),
+            ('org.sikuli.script.Pattern', 'getBImage'),
+            ('org.sikuli.script.ImagePath$PathEntry', 'getURL'),
+            ('org.sikuli.script.ImagePath', 'get'),
+            ('org.sikuli.script.ImagePath', 'append'),
+            ('org.sikuli.script.ImagePath', 'insert'),
+            ('org.sikuli.script.ImagePath', 'replace'),
+            ('org.sikuli.script.ImagePath', 'find'),
+            ('org.sikuli.guide.SxImage', 'getImage'),
+            ('org.sikuli.guide.SxArrow', 'getSource'),
+            ('org.sikuli.guide.SxArrow', 'getDestination'),
+            ('org.sikuli.util.OverlayCapturePrompt', 'getOriginal'),
+            ('org.sikuli.util.SikulixFileChooser', 'open'),
+            ('org.sikuli.util.SikulixFileChooser', 'save'),
+            ('org.sikuli.util.SikulixFileChooser', 'saveAs'),
+            ('org.sikuli.util.SikulixFileChooser', 'export'),
+            ('org.sikuli.util.SikulixFileChooser', 'loadImage'),
+            ('org.sikuli.support.FileManager', 'getProxy'),
+            ('org.sikuli.support.gui.SXDialog', 'getItem'),
+            ('org.sikuli.support.Commons', 'getStartClass'),
+            ('org.sikuli.util.OverlayTransparentWindow', 'getJPanel'),
+            ('org.sikuli.util.OverlayTransparentWindow', 'getJPanelGraphics'),
+            ('java.io.File', 'getParent'),
+            ('java.io.File', 'getParentFile'),
+            ('java.io.File', 'list'),
+            ('java.io.File', 'listFiles'),
+            ('java.io.BufferedReader', 'readLine'),
+            ('java.lang.Class', 'getSuperclass'),
+            ('java.lang.Class', 'getDeclaringClass'),
+            ('java.lang.Class', 'getEnclosingClass'),
+            ('java.lang.Class', 'getComponentType'),
+            ('java.awt.Graphics', 'getClipBounds'),
             ('org.sikuli.script.Region', 'existsText')}:
         member['nullable_return'] = True
+    owner, name = member['declaring_class'], member['name']
+    types = [p['type'] for p in member['parameters']]
+    required = []
+    if owner == 'org.sikuli.script.Image' and name == 'create' and types in [
+            ['java.io.File'], ['java.net.URL'], ['org.sikuli.script.Image'], ['org.sikuli.script.Pattern']]:
+        required = [0]
+    if owner == 'org.sikuli.script.Pattern' and name == owner and types and types != ['java.lang.String']:
+        required = [0]
+    if owner == 'org.sikuli.script.Pattern' and name == 'targetOffset' and types == ['org.sikuli.script.Location']:
+        required = [0]
+    if owner == 'org.sikuli.script.OCR$Options' and name == 'psm' and types == ['org.sikuli.script.OCR$PSM']:
+        required = [0]
+    if owner == 'org.sikuli.script.OCR' and name == 'readText' and len(types) == 2:
+        required = [1]
+    if owner == 'org.sikuli.script.Region' and name == 'create' and types and types[0] in {
+            'org.sikuli.script.Location', 'java.awt.Rectangle', 'org.sikuli.script.Region'}:
+        required = [0]
+    for index in required: member['parameters'][index]['non_null'] = True
     return member
 
 
@@ -56,6 +108,9 @@ def split_generic(value):
 
 def annotation(name, known, generic=None):
     generic = generic or name
+    # Java Object and erased/unbounded type variables remain permissive even
+    # when Object itself has a facade. Python values can legitimately satisfy it.
+    if name == 'java.lang.Object': return 'Any'
     if name.endswith('[]'):
         return 'Sequence[' + annotation(name[:-2], known, generic[:-2] if generic.endswith('[]') else name[:-2]) + ']'
     if name in {'boolean', 'java.lang.Boolean'}: return 'bool'
@@ -84,7 +139,8 @@ def input_annotation(parameter, known, schema):
     if schema.get(name, {}).get('enum'): choices.append('str')
     if schema.get(name, {}).get('interface') or name == 'org.sikuli.script.ObserverCallBack':
         choices += ['JavaCallback', 'Callable[..., Any]']
-    if name not in {'boolean', 'byte', 'short', 'int', 'long', 'float', 'double', 'char'}: choices.append('None')
+    if name not in {'boolean', 'byte', 'short', 'int', 'long', 'float', 'double', 'char'} and not parameter.get('non_null'):
+        choices.append('None')
     return 'Union[' + ', '.join(dict.fromkeys(choices)) + ']'
 
 
@@ -105,14 +161,32 @@ def generate(manifest, sources):
     # Alias collisions across Java packages use the full package in the flat module.
     for name, alias in list(known.items()):
         if list(known.values()).count(alias) > 1: known[name] = name.replace('.', '_').replace('$', '_')
-    for c in manifest['classes']:
+    # Preserve Oculix aliases: java.awt.Image must not rename oculix.Image.
+    support = json.loads(gzip.decompress((ROOT / 'tools/java-support-api-4.0.0.json.gz').read_bytes()))
+    additional = []
+    for c in support['classes']:
+        name = c['class']
+        if name in known: continue
+        alias = name.rsplit('.', 1)[-1].replace('$', '_')
+        if alias in known.values(): alias = 'Java' + alias
+        if alias in known.values(): alias = name.replace('.', '_').replace('$', '_')
+        known[name] = alias
+        start = len(methods)
+        methods.extend(enrich(dict(m, parameters=[dict(p) for p in m['parameters']]), sources) for m in c['methods'])
+        additional.append(dict(c, method_ids=list(range(start, len(methods))), support_type=True))
+    for name in ['org.sikuli.guide.NewAnimator', 'org.sikuli.support.gui.SXDialog$BasicItem']:
+        known[name] = name.rsplit('.', 1)[-1].replace('$', '_')
+        additional.append({'class': name, 'superclass': 'java.lang.Object', 'interfaces': [],
+                           'interface': False, 'enum': False, 'constructors': [], 'fields': [],
+                           'method_ids': [], 'opaque': True})
+    for c in manifest['classes'] + additional:
         row = dict(c)
         row.pop('method_ids')
         row['methods'] = [methods[i] for i in c['method_ids']]
         row['constructors'] = [enrich(dict(m, parameters=[dict(p) for p in m['parameters']]), sources) for m in c['constructors']]
         row['python_name'] = known[c['class']]
         schema[c['class']] = row
-    lines = ['"""Generated Oculix 4.0.0 API. Do not edit; run tools/generate_python_api.py."""',
+    lines = ['"""Generated Oculix 4.0.0 API. Do not edit; run tools/generate_python_api.py."""', 'import typing',
              'from typing import Any, Sequence, Mapping, Iterable, Union, Optional, Callable, overload, ClassVar',
              'from oculix._api import JavaObject, JavaCallback', '']
     ordered = []
@@ -125,7 +199,9 @@ def generate(manifest, sources):
     for name in ordered:
         c = schema[name]
         parent = known.get(c['superclass'], 'JavaObject')
-        lines += [f'class {known[name]}({parent}):', '    JAVA_CLASS: ClassVar[str]']
+        lines += [f'class {known[name]}({parent}):', '    JAVA_CLASS: ClassVar[str]',
+                  '    @classmethod',
+                  f'    def overload(cls, *parameter_types: str) -> Callable[..., {known[name]}]: ...']
         groups = {'__init__': c['constructors']}
         for m in c['methods']:
             groups.setdefault(identifier(m['name']), []).append(m)
@@ -141,7 +217,7 @@ def generate(manifest, sources):
                 key = (m['static'], tuple(p['type'] for p in m['parameters']))
                 if key in seen: continue
                 seen.add(key)
-                if len(overloads) > 1: lines.append('    @overload')
+                if len(overloads) > 1: lines.append('    @typing.overload')
                 if m['static']: lines.append('    @staticmethod')
                 params = [] if m['static'] else ['self']
                 for i, p in enumerate(m['parameters']):

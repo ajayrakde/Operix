@@ -335,7 +335,23 @@ final class Dispatcher {
         // Anything else becomes an opaque ref
         String id = registry.register(v);
         return new JSONObject().put("__ref", id).put("__class", c.getName())
+                .put("__types", referenceTypes(c))
                 .put("__kind", v instanceof Iterator<?> ? "iterator" : "object");
+    }
+
+    private static JSONArray referenceTypes(Class<?> root) {
+        JSONArray names = new JSONArray();
+        Set<Class<?>> seen = new HashSet<>();
+        ArrayDeque<Class<?>> queue = new ArrayDeque<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            Class<?> type = queue.remove();
+            if (!seen.add(type)) continue;
+            names.put(type.getName());
+            if (type.getSuperclass() != null) queue.add(type.getSuperclass());
+            queue.addAll(Arrays.asList(type.getInterfaces()));
+        }
+        return names;
     }
 
     private static Object[] coerce(Class<?>[] types, Object[] args) {
@@ -418,14 +434,14 @@ final class Dispatcher {
     // Public methods implemented by non-public JDK collection/iterator classes
     // must be invoked through an accessible public interface, not setAccessible.
     private static Method accessibleMethod(Object target, Method method) {
-        if (Modifier.isPublic(method.getDeclaringClass().getModifiers())) return method;
+        if (accessibleType(method.getDeclaringClass())) return method;
         Deque<Class<?>> queue = new ArrayDeque<>();
         queue.add(target.getClass());
         Set<Class<?>> seen = new HashSet<>();
         while (!queue.isEmpty()) {
             Class<?> type = queue.remove();
             if (!seen.add(type)) continue;
-            if (Modifier.isPublic(type.getModifiers())) {
+            if (accessibleType(type)) {
                 try { return type.getMethod(method.getName(), method.getParameterTypes()); }
                 catch (NoSuchMethodException ignored) { }
             }
@@ -433,6 +449,11 @@ final class Dispatcher {
             if (type.getSuperclass() != null) queue.add(type.getSuperclass());
         }
         return method;
+    }
+
+    private static boolean accessibleType(Class<?> type) {
+        return Modifier.isPublic(type.getModifiers())
+            && type.getModule().isExported(type.getPackageName(), Dispatcher.class.getModule());
     }
 
     /** Mirrors java.util.NoSuchElementException without forcing a verbose import in callers. */

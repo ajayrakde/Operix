@@ -33,7 +33,18 @@ public final class ApiInventory {
     public static void main(String[] args) throws Exception {
         PrintStreamGuard guard = new PrintStreamGuard();
         List<String> names = new ArrayList<>();
-        try (JarFile jar = new JarFile(args[0])) {
+        if (args.length > 1) {
+            // Bounded support inventory: explicit roots and public superclasses.
+            Set<String> roots = new TreeSet<>();
+            for (String name : args[1].split(",")) {
+                Class<?> type = Class.forName(name, false, ApiInventory.class.getClassLoader());
+                while (type != null) {
+                    if (Modifier.isPublic(type.getModifiers())) roots.add(type.getName());
+                    type = type.getSuperclass();
+                }
+            }
+            names.addAll(roots);
+        } else try (JarFile jar = new JarFile(args[0])) {
             jar.stream().map(entry -> entry.getName())
                 .filter(name -> name.endsWith(".class"))
                 .filter(name -> name.startsWith("org/sikuli/") || name.startsWith("com/sikulix/"))

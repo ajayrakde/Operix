@@ -10,7 +10,7 @@ import oculix
 from oculix._bridge import Bridge
 
 ROOT = Path(__file__).resolve().parents[2]
-JAR = ROOT / 'jvm-bridge/target/operix-jvm-bridge-1.1.1.jar'
+JAR = ROOT / 'jvm-bridge/target/operix-jvm-bridge-1.2.0b1.jar'
 pytestmark = pytest.mark.skipif(os.environ.get('OCULIX_DESKTOP_TESTS') != '1', reason='Requires a graphical desktop')
 
 
@@ -53,6 +53,9 @@ def test_capture_find_text_click_type_and_background_observer(desktop):
     button = region(layout['button'])
     capture = screen.capture(button)
     assert isinstance(capture, oculix.ScreenImage)
+    pixels = capture.getImage()
+    assert isinstance(pixels, oculix.BufferedImage)
+    assert pixels.getWidth() > 0 and pixels.getHeight() > 0
     image_path = capture.getFile()
     found = area.find(oculix.Pattern(image_path).similar(0.9))
     assert found.getScore() >= 0.9
@@ -78,3 +81,36 @@ def test_capture_find_text_click_type_and_background_observer(desktop):
         assert bridge.callback_errors == ()
     finally:
         area.stopObserver()
+
+
+def test_typed_devices_gui_and_guide_on_desktop(desktop):
+    bridge, app, layout = desktop
+    device = oculix.ScreenDevice.primary()
+    assert isinstance(device.asRectangle(), oculix.Rectangle)
+    assert isinstance(device.getCenter(), oculix.Point)
+    robot = device.getRobot()
+    assert isinstance(robot, oculix.Robot)
+    bounds = layout['label']
+    rectangle = oculix.Rectangle(bounds['x'], bounds['y'], bounds['w'], bounds['h'])
+    pixels = robot.createScreenCapture(rectangle)
+    assert isinstance(pixels, oculix.BufferedImage)
+    assert isinstance(robot.getPixelColor(bounds['x'], bounds['y']), oculix.Color)
+    assert '12345' in oculix.OCR.readText(pixels)
+    visual = oculix.SxImage(pixels)
+    assert isinstance(visual.getBounds(), oculix.Rectangle)
+    assert isinstance(visual.getActualSize(), oculix.Dimension)
+    overlay = oculix.OverlayTransparentWindow(oculix.Color.WHITE, None)
+    try:
+        assert isinstance(overlay.getJPanel(), oculix.JPanel)
+        assert overlay.getJPanelGraphics() is None  # Not painted yet.
+        assert isinstance(overlay.getContentPane(), oculix.Container)
+    finally:
+        overlay.dispose()
+    # Pure resize helper covers the public SXDialog API without opening a modal.
+    dialog = oculix.SXDialog()
+    try:
+        assert dialog.getItem('missing') is None
+        resized = dialog.adjustTo(oculix.Rectangle(0, 0, 100, 100), pixels)
+        assert isinstance(resized, oculix.BufferedImage)
+    finally:
+        dialog.dispose()

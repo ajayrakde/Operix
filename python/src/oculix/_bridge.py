@@ -22,7 +22,7 @@ from typing import Any, Optional, Type
 
 # --- bridge JAR distribution -------------------------------------------------
 
-BRIDGE_VERSION = "1.1.1"
+BRIDGE_VERSION = "1.2.0b1"
 BRIDGE_JAR_NAME = f"operix-jvm-bridge-{BRIDGE_VERSION}.jar"
 BRIDGE_JAR_URL = (
     "https://github.com/ajayrakde/Operix/releases/download/"
@@ -342,7 +342,9 @@ def _decode(bridge: Bridge, v: Any) -> Any:
         wrapper = _WRAPPER_TYPES.get(remote._class)
         if wrapper is None:
             from ._api import java_class
-            wrapper = java_class(remote._class)
+            parent = next((_WRAPPER_TYPES[name] for name in v.get('__types', [])
+                           if name in _WRAPPER_TYPES and name != 'java.lang.Object'), None)
+            wrapper = java_class(remote._class, parent=parent)
         obj = wrapper._wrap(remote)
         bridge._cache[ref] = obj
         return obj

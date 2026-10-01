@@ -94,6 +94,10 @@ class BoundJavaMethod:
             index = bridge.resolve_overload(self.owner.JAVA_CLASS, self.__name__, candidates)
         else: index = 0
         member, prepared = candidates[index]
+        for parameter, value in zip(member['parameters'], prepared):
+            if value is None and parameter.get('non_null'):
+                raise TypeError(f"{self.owner.JAVA_CLASS}.{self.__name__}: {parameter['name']} "
+                                f"must not be None ({parameter['type']})")
         types = [p['type'] for p in member['parameters']]
         if self.__name__ == '<init>': return bridge.create(self.owner.JAVA_CLASS, prepared, parameter_types=types)
         if member['static']:
@@ -132,6 +136,10 @@ class JavaField:
 
 
 class JavaMeta(type):
+    def overload(cls, *parameter_types):
+        """Select an exact public constructor, including null reference calls."""
+        members = _SCHEMA.get(cls.JAVA_CLASS, {}).get('constructors', [])
+        return BoundJavaMethod(JavaMethod('<init>', members), None, cls).overload(*parameter_types)
     def __setattr__(cls, name, value):
         descriptor = next((p.__dict__[name] for p in cls.__mro__ if name in p.__dict__), None)
         if isinstance(descriptor, JavaField): descriptor.set(cls, None, value)
@@ -153,6 +161,9 @@ class JavaObject(RemoteWrapper, metaclass=JavaMeta):
     @property
     def _bridge(self): return self._remote._bridge
     def __getattr__(self, name):
+        if any(_SCHEMA.get(parent.JAVA_CLASS, {}).get('opaque') for parent in type(self).__mro__
+               if hasattr(parent, 'JAVA_CLASS')):
+            raise AttributeError(f'{self._remote._class} is an opaque Java handle; use the public owner API')
         if self.JAVA_CLASS in _SCHEMA: raise AttributeError(name)
         return super().__getattr__(name)
     def __iter__(self):
@@ -179,9 +190,9 @@ class JavaCallback:
         return function(*args)
 
 
-def java_class(name):
+def java_class(name, *, parent=None):
     if name in _TYPES: return _TYPES[name]
-    cls = JavaMeta(name.rsplit('.', 1)[-1].replace('$', '_'), (JavaObject,), {'JAVA_CLASS': name, '__module__': 'oculix.java'})
+    cls = JavaMeta(name.rsplit('.', 1)[-1].replace('$', '_'), (parent or JavaObject,), {'JAVA_CLASS': name, '__module__': 'oculix.java'})
     _TYPES[name] = cls
     register_wrapper(name, cls)
     return cls
