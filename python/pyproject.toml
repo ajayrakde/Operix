@@ -1,30 +1,36 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "oculix"
-version = "1.0.0"
-description = "Visual automation for the real world — Python wrapper for OculiX"
+name = "pyulix"
+version = "1.2.0b2"
+description = "Pyulix: independent Python visual automation bridge"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.8"
-authors = [{name = "Julien Mer", email = "julien.mer38@gmail.com"}]
+authors = [{name = "Ajay Rakde"}]
+maintainers = [{name = "Ajay Rakde"}]
 keywords = ["visual-testing", "automation", "ocr", "sikuli", "gui-testing"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
     "Topic :: Software Development :: Testing",
 ]
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/oculix-org/Operix"
-Repository = "https://github.com/oculix-org/Operix"
+Homepage = "https://github.com/ajayrakde/Operix"
+Repository = "https://github.com/ajayrakde/Operix"
+
+Issues = "https://github.com/ajayrakde/Operix/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+pyulix = ["_api_schema.json.gz", "py.typed", "*.pyi", "**/*.pyi"]

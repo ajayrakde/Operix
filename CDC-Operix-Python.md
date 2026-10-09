@@ -1,3 +1,7 @@
+> **Independent fork:** Pyulix is maintained by **Ajay Rakde** and is neither affiliated with nor endorsed by the OculiX project. Original work by Julien Mer and contributors; original copyright and MIT license notices are preserved. [Support](https://github.com/ajayrakde/Operix/issues).
+
+> Historical upstream architecture notes follow; they are not Pyulix release promises. Current fork usage is in README.md and python/README.md.
+
 # CDC — Operix (Python)
 ## Python wrapper for OculiX via Py4J
 
@@ -30,7 +34,7 @@ pip install oculix
 ```
 
 ```python
-from oculix import Screen, App, Pattern
+from pyulix import Screen, App, Pattern
 
 screen = Screen()
 screen.click("button.png")
@@ -43,7 +47,7 @@ app = App.open("notepad")
 +---------------------+         +---------------------+
 |   Python process    |  Py4J   |   JVM process       |
 |                     | socket  |                     |
-|   from oculix ...   |<------->|   oculixapi.jar     |
+|   from pyulix ...   |<------->|   oculixapi.jar     |
 |   screen.click()    |         |   + py4j JAR        |
 |                     |         |   (py4j.GatewayServer)|
 +---------------------+         +---------------------+
@@ -53,7 +57,7 @@ Aucun code Java custom cote Operix : on s'appuie sur `py4j.GatewayServer`
 (classe `main` fournie par py4j) pour exposer la JVM, et le repo Oculix
 est utilise tel quel sans modification.
 
-1. Au premier `import oculix`, le package :
+1. Au premier `import pyulix`, le package :
    - Verifie si Java est installe (`java -version`)
    - Verifie si `oculixapi-3.0.3.jar` est present dans `~/.oculix/lib/`
    - Si absent, le telecharge depuis Maven Central
@@ -159,7 +163,7 @@ def jvm():
 ### 5.2 __init__.py — API publique
 
 ```python
-from oculix.gateway import jvm, start, stop
+from pyulix.gateway import jvm, start, stop
 
 def __getattr__(name):
     _jvm = jvm()
@@ -209,7 +213,7 @@ donc aucune modification d'Oculix n'est necessaire.
 ### 6.1 Script basique
 
 ```python
-from oculix import Screen, Key
+from pyulix import Screen, Key
 
 screen = Screen()
 screen.click("login_button.png")
@@ -223,7 +227,7 @@ screen.wait("dashboard.png", 10)
 ### 6.2 VNC remote
 
 ```python
-from oculix import VNCScreen, SSHTunnel
+from pyulix import VNCScreen, SSHTunnel
 
 tunnel = SSHTunnel("root", "10.184.10.147", 22, "password")
 tunnel.open(5900, "localhost", 5900)
@@ -237,7 +241,7 @@ vnc.stop()
 ### 6.3 Android ADB
 
 ```python
-from oculix import ADBScreen, Pattern
+from pyulix import ADBScreen, Pattern
 
 # ADBScreen lives in org.sikuli.android in Oculix 3.x
 adb = ADBScreen.start("/usr/local/bin/adb")
@@ -247,7 +251,7 @@ adb.click(Pattern("accept_button.png").similar(0.7))
 ### 6.5 PaddleOCR (text find/click)
 
 ```python
-from oculix import Screen, PaddleOCREngine
+from pyulix import Screen, PaddleOCREngine
 
 screen = Screen()
 # Use the neural OCR engine bundled with Oculix instead of Tesseract
@@ -260,7 +264,7 @@ match.click()
 
 ```python
 import pytest
-from oculix import Screen, App
+from pyulix import Screen, App
 
 @pytest.fixture
 def app():
@@ -291,7 +295,7 @@ description = "Visual automation for the real world - Python wrapper for OculiX"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
-authors = [{name = "Julien Mer", email = "julien.mer38@gmail.com"}]
+authors = [{name = "Ajay Rakde"}]
 keywords = ["visual-testing", "automation", "ocr", "sikuli", "gui-testing"]
 dependencies = ["py4j>=0.10.9"]
 

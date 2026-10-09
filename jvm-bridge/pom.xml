@@ -7,11 +7,11 @@
 
     <groupId>org.operix</groupId>
     <artifactId>operix-jvm-bridge</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0b2</version>
     <packaging>jar</packaging>
 
-    <name>Operix JVM Bridge</name>
-    <description>JSON-RPC server bridging Node.js / .NET clients to OculiX</description>
+    <name>Pyulix JVM Bridge</name>
+    <description>Independent Pyulix JSON-RPC bridge to the OculiX engine</description>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -41,6 +41,10 @@
 
     <build>
         <finalName>operix-jvm-bridge-${project.version}</finalName>
+        <resources>
+            <resource><directory>..</directory><includes><include>LICENSE</include><include>NOTICE</include></includes><targetPath>META-INF/pyulix</targetPath></resource>
+            <resource><directory>src/main/resources</directory></resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -73,6 +77,7 @@
                                     <mainClass>org.operix.rpc.Server</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
                             </transformers>
                         </configuration>
                     </execution>

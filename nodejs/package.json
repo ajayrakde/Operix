@@ -1,7 +1,7 @@
 {
-  "name": "oculix",
+  "name": "pyulix-node-reference",
   "version": "0.1.0",
-  "description": "Visual automation for the real world — Node.js wrapper for OculiX",
+  "description": "Visual automation for the real world \u2014 Node.js wrapper for OculiX",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -26,11 +26,11 @@
     "vnc",
     "adb"
   ],
-  "author": "Julien Mer <julien.mer38@gmail.com>",
+  "author": "Ajay Rakde",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/oculix-org/Operix",
+    "url": "https://github.com/ajayrakde/Operix",
     "directory": "nodejs"
   },
   "engines": {
@@ -47,6 +47,9 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.ts"]
-  }
+    "testMatch": [
+      "**/tests/**/*.test.ts"
+    ]
+  },
+  "private": true
 }

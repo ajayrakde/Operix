@@ -1,0 +1,8 @@
+Pyulix is an independent fork of Operix, maintained by Ajay Rakde.
+It is neither affiliated with nor endorsed by the OculiX project.
+Original work by Julien Mer and the Operix/OculiX contributors.
+Original copyright and MIT license notices are preserved in LICENSE.
+Support for this fork: https://github.com/ajayrakde/Operix/issues
+
+The separately downloaded JVM engine and its bundled dependencies retain
+their own licenses and notices. The Pyulix MIT license does not replace them.

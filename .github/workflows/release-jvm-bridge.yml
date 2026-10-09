@@ -4,7 +4,7 @@ name: Release jvm-bridge
 # dispatched on its own. The version is read straight from jvm-bridge/pom.xml.
 # Before releasing, bump the version constants so they all match
 # jvm-bridge/pom.xml:<version>:
-#   - python/src/oculix/_bridge.py:BRIDGE_VERSION
+#   - python/src/pyulix/_bridge.py:BRIDGE_VERSION
 #   - nodejs/src/bridge.ts:BRIDGE_VERSION
 #   - dotnet/src/OculiX/Bridge.cs:BridgeVersion
 
@@ -47,9 +47,12 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: jvm-bridge-${{ steps.pom.outputs.version }}
+          prerelease: ${{ contains(steps.pom.outputs.version, 'b') || contains(steps.pom.outputs.version, 'rc') || contains(steps.pom.outputs.version, 'alpha') }}
+          make_latest: false
           name: jvm-bridge ${{ steps.pom.outputs.version }}
           body: |
-            OculiX JVM bridge (fat JAR) for the Python / Node.js / .NET wrappers.
+            Pyulix independent JVM bridge (beta). Maintained by Ajay Rakde.
+            Not affiliated with or endorsed by the OculiX project.
 
             Includes oculixapi + Apertix OpenCV + JSON-RPC server.
             Wrappers download this artifact on first use.
