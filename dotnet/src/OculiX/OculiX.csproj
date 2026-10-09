@@ -7,13 +7,14 @@
     <RootNamespace>OculiX</RootNamespace>
     <AssemblyName>OculiX</AssemblyName>
 
-    <PackageId>OculiX</PackageId>
+    <PackageId>Pyulix.Reference</PackageId>
+    <IsPackable>false</IsPackable>
     <Version>0.1.0</Version>
-    <Authors>Julien Mer</Authors>
+    <Authors>Ajay Rakde</Authors>
     <Description>Visual automation for the real world — .NET wrapper for OculiX</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/oculix-org/Operix</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/oculix-org/Operix</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ajayrakde/Operix</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ajayrakde/Operix</RepositoryUrl>
     <PackageTags>visual-testing;automation;ocr;sikuli;oculix;gui-testing;desktop-testing</PackageTags>
   </PropertyGroup>
 

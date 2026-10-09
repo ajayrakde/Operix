@@ -14,9 +14,9 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'python/src'))
-import oculix
-from oculix._bridge import _WRAPPER_TYPES
-from oculix._api import JavaMethod
+import pyulix
+from pyulix._bridge import _WRAPPER_TYPES
+from pyulix._api import JavaMethod
 
 
 def reflected_inventory(jar, compiler_jar):
@@ -78,7 +78,7 @@ def coverage(method, wrapper):
 
 def summarize(inventory):
     wrappers = dict(_WRAPPER_TYPES)
-    wrappers[oculix.OCR.JAVA_CLASS] = oculix.OCR
+    wrappers[pyulix.OCR.JAVA_CLASS] = pyulix.OCR
     rows = []
     for cls in inventory['classes']:
         wrapper = wrappers.get(cls['class'])

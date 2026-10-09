@@ -1,7 +1,7 @@
 """Generated Oculix 4.0.0 API. Do not edit; run tools/generate_python_api.py."""
 import typing
 from typing import Any, Sequence, Mapping, Iterable, Union, Optional, Callable, overload, ClassVar
-from oculix._api import JavaObject, JavaCallback
+from pyulix._api import JavaObject, JavaCallback
 
 class OCREngine(JavaObject):
     JAVA_CLASS: ClassVar[str]

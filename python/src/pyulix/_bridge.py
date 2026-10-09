@@ -2,7 +2,7 @@
 
 The bridge is a fat JAR (~160 MB) containing oculixapi + Apertix OpenCV +
 our minimal RPC server. It's downloaded once from GitHub Releases on first
-use and cached under ``~/.oculix/lib/``.
+use and cached under ``~/.pyulix/lib/``.
 """
 
 from __future__ import annotations
@@ -22,13 +22,13 @@ from typing import Any, Optional, Type
 
 # --- bridge JAR distribution -------------------------------------------------
 
-BRIDGE_VERSION = "1.2.0b1"
+BRIDGE_VERSION = "1.2.0b2"
 BRIDGE_JAR_NAME = f"operix-jvm-bridge-{BRIDGE_VERSION}.jar"
 BRIDGE_JAR_URL = (
     "https://github.com/ajayrakde/Operix/releases/download/"
     f"jvm-bridge-{BRIDGE_VERSION}/{BRIDGE_JAR_NAME}"
 )
-JAR_DIR = Path(os.path.expanduser("~/.oculix/lib/ajayrakde-operix"))
+JAR_DIR = Path(os.path.expanduser("~/.pyulix/lib"))
 
 
 def _ensure_jar() -> Path:
@@ -36,7 +36,7 @@ def _ensure_jar() -> Path:
     if jar_path.exists():
         return jar_path
     JAR_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"[OculiX] Downloading {BRIDGE_JAR_NAME} (~160 MB)…")
+    print(f"[Pyulix] Downloading {BRIDGE_JAR_NAME} (~160 MB)…")
     # Download atomically: interrupted installs must not leave a cached broken JAR.
     import tempfile
     temp = None
@@ -51,7 +51,7 @@ def _ensure_jar() -> Path:
         os.replace(temp, jar_path)
     finally:
         if temp is not None and temp.exists(): temp.unlink()
-    print(f"[OculiX] Saved to {jar_path}")
+    print(f"[Pyulix] Saved to {jar_path}")
     return jar_path
 
 
@@ -67,7 +67,7 @@ class Bridge:
     def __init__(self, jar_path: Optional[Path] = None, java_bin: str = "java"):
         if shutil.which(java_bin) is None:
             raise RuntimeError(
-                f"{java_bin!r} not found on PATH. Install Java 11+ "
+                f"{java_bin!r} not found on PATH. Install Java 17+ "
                 "(https://adoptium.net) and retry."
             )
         self._jar = jar_path or _ensure_jar()
@@ -106,8 +106,8 @@ class Bridge:
             encoding="utf-8",
             errors="replace",    # belt-and-suspenders: never crash on a stray byte
         )
-        threading.Thread(target=self._read_responses, daemon=True, name="operix-rpc").start()
-        threading.Thread(target=self._read_stderr, daemon=True, name="operix-stderr").start()
+        threading.Thread(target=self._read_responses, daemon=True, name="pyulix-rpc").start()
+        threading.Thread(target=self._read_stderr, daemon=True, name="pyulix-stderr").start()
         atexit.register(self.stop)
 
     def stop(self) -> None:

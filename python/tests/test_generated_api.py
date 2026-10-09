@@ -5,9 +5,9 @@ import inspect
 import json
 from pathlib import Path
 import pytest
-import oculix
-from oculix._api import _SCHEMA, _TYPES, JavaMethod, JavaField, _bind
-from oculix._bridge import _WRAPPER_TYPES, _decode
+import pyulix
+from pyulix._api import _SCHEMA, _TYPES, JavaMethod, JavaField, _bind
+from pyulix._bridge import _WRAPPER_TYPES, _decode
 
 
 def test_every_public_type_and_java_overload_is_declared():
@@ -22,23 +22,23 @@ def test_every_public_type_and_java_overload_is_declared():
         for field in row['fields']:
             if field['name'] not in {m['name'] for m in row['methods']}:
                 assert isinstance(inspect.getattr_static(cls, field['name']), JavaField)
-    ast.parse(Path(oculix.__file__).parent.joinpath('java/__init__.pyi').read_text())
+    ast.parse(Path(pyulix.__file__).parent.joinpath('java/__init__.pyi').read_text())
 
 
 def test_java_inheritance_nested_types_and_false_argument(bridge=None):
-    assert issubclass(oculix.Match, oculix.Region)
-    assert issubclass(oculix.Screen, oculix.Region)
-    assert oculix.OCR.Options.JAVA_CLASS == 'org.sikuli.script.OCR$Options'
-    member = next(m for m in oculix.Region.setThrowException.overloads if len(m['parameters']) == 1)
+    assert issubclass(pyulix.Match, pyulix.Region)
+    assert issubclass(pyulix.Screen, pyulix.Region)
+    assert pyulix.OCR.Options.JAVA_CLASS == 'org.sikuli.script.OCR$Options'
+    member = next(m for m in pyulix.Region.setThrowException.overloads if len(m['parameters']) == 1)
     args = _bind(member, (False,), {})
     assert args == [False]
 
 
 def test_names_that_never_existed_are_not_exposed():
-    assert not hasattr(oculix.PaddleOCREngine, 'getInstance')
-    assert not hasattr(oculix.ADBScreen, 'tap')
-    assert not hasattr(oculix.Region, 'capture')
-    assert hasattr(oculix.Screen, 'capture')
+    assert not hasattr(pyulix.PaddleOCREngine, 'getInstance')
+    assert not hasattr(pyulix.ADBScreen, 'tap')
+    assert not hasattr(pyulix.Region, 'capture')
+    assert hasattr(pyulix.Screen, 'capture')
 
 
 def test_nullable_and_generic_hints_are_source_backed():

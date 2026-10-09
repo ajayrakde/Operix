@@ -15,8 +15,8 @@ _TYPES = {}
 
 
 def _default_bridge():
-    import oculix
-    return oculix.default_bridge()
+    import pyulix
+    return pyulix.default_bridge()
 
 
 def _identifier(name):
@@ -192,7 +192,7 @@ class JavaCallback:
 
 def java_class(name, *, parent=None):
     if name in _TYPES: return _TYPES[name]
-    cls = JavaMeta(name.rsplit('.', 1)[-1].replace('$', '_'), (parent or JavaObject,), {'JAVA_CLASS': name, '__module__': 'oculix.java'})
+    cls = JavaMeta(name.rsplit('.', 1)[-1].replace('$', '_'), (parent or JavaObject,), {'JAVA_CLASS': name, '__module__': 'pyulix.java'})
     _TYPES[name] = cls
     register_wrapper(name, cls)
     return cls
@@ -205,7 +205,7 @@ def load_api(namespace):
         for name in ready:
             row = _SCHEMA[name]
             base = _TYPES.get(row['superclass'], JavaObject)
-            attrs = {'JAVA_CLASS': name, '__module__': 'oculix.java', '__doc__': 'Java ' + name}
+            attrs = {'JAVA_CLASS': name, '__module__': 'pyulix.java', '__doc__': 'Java ' + name}
             groups = {}
             for m in row['methods']: groups.setdefault(m['name'], []).append(m)
             for mname, members in groups.items():

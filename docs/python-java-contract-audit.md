@@ -1,6 +1,6 @@
 # Concrete Java contracts: overloads, null, and Any
 
-Audit date: 2026-10-01. Bridge: oculix-operix 1.1.1. Java dependency:
+Audit date: 2026-10-01. Bridge: pyulix 1.1.1. Java dependency:
 `io.github.oculix-org:oculixapi:4.0.0`.
 
 Evidence is the [published Java sources](https://repo.maven.apache.org/maven2/io/github/oculix-org/oculixapi/4.0.0/oculixapi-4.0.0-sources.jar)
@@ -242,7 +242,7 @@ they should remain callable and share the newly added support types.
 4. Track opaque Java return types separately; Java interface changes are needed
    only for direct operations on their inaccessible implementation APIs.
 
-Implemented in **1.2.0b1**: 27 public support facades (16 roots plus their
+Implemented in **1.2.0b2**: 27 public support facades (16 roots plus their
 public superclasses), two opaque types, runtime subtype metadata, invocation
 through exported Java APIs, reviewed nullable results and invalid-null guards,
 and exact constructor selection via Class.overload. The CSV records actual beta
