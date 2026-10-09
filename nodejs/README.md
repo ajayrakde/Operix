@@ -1,3 +1,7 @@
+> **Independent fork:** Pyulix is maintained by **Ajay Rakde** and is neither affiliated with nor endorsed by the OculiX project. Original work by Julien Mer and contributors; original copyright and MIT license notices are preserved. [Support](https://github.com/ajayrakde/Operix/issues).
+
+> **Inherited reference implementation:** not a supported Pyulix release. Registry publication from this fork is disabled. Examples below describe upstream names.
+
 # oculix (Node.js / TypeScript)
 
 Node.js wrapper for [OculiX](https://github.com/oculix-org/Oculix) — visual automation for the real world.

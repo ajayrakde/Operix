@@ -1,6 +1,6 @@
 """Static checks only; this module is never executed on a desktop."""
 from typing import Iterable, Optional, Sequence, assert_type
-from oculix import Screen, Match, Location, Pattern, OCR, Image, File, URL, BufferedImage, Rectangle, Graphics2D, Visual, Point, NewAnimator, AnimationFactory, SXDialog, SXDialog_BasicItem
+from pyulix import Screen, Match, Location, Pattern, OCR, Image, File, URL, BufferedImage, Rectangle, Graphics2D, Visual, Point, NewAnimator, AnimationFactory, SXDialog, SXDialog_BasicItem
 
 screen = Screen()
 assert_type(screen.findText('Submit'), Match)

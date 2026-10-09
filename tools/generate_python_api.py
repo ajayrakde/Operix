@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE = ROOT / 'python/src/oculix'
+PACKAGE = ROOT / 'python/src/pyulix'
 
 
 def simple_type(name):
@@ -161,7 +161,7 @@ def generate(manifest, sources):
     # Alias collisions across Java packages use the full package in the flat module.
     for name, alias in list(known.items()):
         if list(known.values()).count(alias) > 1: known[name] = name.replace('.', '_').replace('$', '_')
-    # Preserve Oculix aliases: java.awt.Image must not rename oculix.Image.
+    # Preserve Oculix aliases: java.awt.Image must not rename pyulix.Image.
     support = json.loads(gzip.decompress((ROOT / 'tools/java-support-api-4.0.0.json.gz').read_bytes()))
     additional = []
     for c in support['classes']:
@@ -188,7 +188,7 @@ def generate(manifest, sources):
         schema[c['class']] = row
     lines = ['"""Generated Oculix 4.0.0 API. Do not edit; run tools/generate_python_api.py."""', 'import typing',
              'from typing import Any, Sequence, Mapping, Iterable, Union, Optional, Callable, overload, ClassVar',
-             'from oculix._api import JavaObject, JavaCallback', '']
+             'from pyulix._api import JavaObject, JavaCallback', '']
     ordered = []
     todo = set(schema)
     while todo:
@@ -236,7 +236,7 @@ def generate(manifest, sources):
                 lines.append(f"    {identifier(child.rsplit('$', 1)[-1])}: ClassVar[type[{known[child]}]]")
         lines += ['']
     runtime = ['"""Generated named Oculix API, with exact overload metadata."""',
-               'from oculix._api import load_api', '',
+               'from pyulix._api import load_api', '',
                'load_api(globals())', '']
     return {
         PACKAGE / '_api_schema.json.gz': gzip.compress(json.dumps(schema, sort_keys=True, separators=(',', ':')).encode(), mtime=0),

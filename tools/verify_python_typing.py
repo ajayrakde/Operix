@@ -18,7 +18,7 @@ positive = check(ROOT / 'python/typing_examples/api_usage.py')
 assert positive['summary']['errorCount'] == 0, positive['generalDiagnostics']
 with tempfile.TemporaryDirectory(prefix='operix-typing-') as directory:
     negative = Path(directory) / 'invalid.py'
-    negative.write_text("from oculix import Screen\nscreen = Screen()\nscreen.exists('missing.png').getScore()\nscreen.noSuchJavaMethod()\n")
+    negative.write_text("from pyulix import Screen\nscreen = Screen()\nscreen.exists('missing.png').getScore()\nscreen.noSuchJavaMethod()\n")
     result = check(negative)
     rules = {d.get('rule') for d in result['generalDiagnostics'] if d['severity'] == 'error'}
     assert 'reportOptionalMemberAccess' in rules, result

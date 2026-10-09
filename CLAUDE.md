@@ -1,3 +1,7 @@
+> **Independent fork:** Pyulix is maintained by **Ajay Rakde** and is neither affiliated with nor endorsed by the OculiX project. Original work by Julien Mer and contributors; original copyright and MIT license notices are preserved. [Support](https://github.com/ajayrakde/Operix/issues).
+
+> Historical upstream architecture notes follow; they are not Pyulix release promises. Current fork usage is in README.md and python/README.md.
+
 # CLAUDE.md — Operix project context for Claude Code
 
 This file is the single entry point Claude Code should read when opening a

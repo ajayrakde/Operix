@@ -1,7 +1,7 @@
 # Python / Oculix Java API parity
 
 Target: Oculix **4.0.0**, pinned by `jvm-bridge/pom.xml`.
-Fork distribution: **oculix-operix 1.1.1**; Python imports remain `oculix`.
+Fork distribution: **pyulix 1.1.1**; Python imports remain `oculix`.
 
 ## Implemented API
 
@@ -60,9 +60,9 @@ this fork and OCR from a fresh wheel installation.
 
 The [1.1.1 GitHub release](https://github.com/ajayrakde/Operix/releases/tag/jvm-bridge-1.1.1)
 contains the wheel, sdist and JVM bridge.
-[oculix-operix 1.1.1 is published on PyPI](https://pypi.org/project/oculix-operix/1.1.1/).
+[pyulix 1.1.1 is published on PyPI](https://pypi.org/project/pyulix/1.1.1/).
 A clean installation from PyPI passed typed API and real OCR validation.
-Install with `python -m pip install oculix-operix==1.1.1`; imports remain `oculix`.
+Install with `python -m pip install pyulix==1.1.1`; imports remain `oculix`.
 
 ## Reproduce
 
@@ -71,7 +71,7 @@ cd jvm-bridge
 mvn -B package
 cd ..
 python -m pip install -e ./python pytest build twine
-OCULIX_OCR_TESTS=1 python -m pytest python/tests -q
+PYULIX_OCR_TESTS=1 python -m pytest python/tests -q
 python tools/inventory_java_api.py --check
 python tools/generate_python_api.py --check
 python -m build python
@@ -79,7 +79,7 @@ python -m twine check python/dist/*
 python tools/verify_python_wheel.py
 ```
 
-Set `OCULIX_DESKTOP_TESTS=1` and run `python/tests/test_desktop.py` on a graphical
+Set `PYULIX_DESKTOP_TESTS=1` and run `python/tests/test_desktop.py` on a graphical
 session. The source fixture is compiled into `jvm-bridge/target/test-classes`.
 Java 17+ is used for builds and inventory tooling. A JRE containing the compiler
 module can also compile helpers through Eclipse ECJ with `--compiler-jar`.

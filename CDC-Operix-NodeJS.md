@@ -1,3 +1,7 @@
+> **Independent fork:** Pyulix is maintained by **Ajay Rakde** and is neither affiliated with nor endorsed by the OculiX project. Original work by Julien Mer and contributors; original copyright and MIT license notices are preserved. [Support](https://github.com/ajayrakde/Operix/issues).
+
+> Historical upstream architecture notes follow; they are not Pyulix release promises. Current fork usage is in README.md and python/README.md.
+
 # CDC — Operix-JS (Node.js)
 ## Node.js wrapper for OculiX via JSON-RPC bridge
 
@@ -399,7 +403,7 @@ testPOS();
     "prepublishOnly": "npm run build"
   },
   "keywords": ["visual-testing", "automation", "ocr", "sikuli", "oculix", "gui-testing", "desktop-testing", "vnc", "adb"],
-  "author": "Julien Mer <julien.mer38@gmail.com>",
+  "author": "Ajay Rakde",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {

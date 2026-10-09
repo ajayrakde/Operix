@@ -1,79 +1,38 @@
-# Operix
+> **Independent fork:** Pyulix is maintained by **Ajay Rakde** and is neither affiliated with nor endorsed by the OculiX project. Original work by Julien Mer and contributors; original copyright and MIT license notices are preserved. [Support](https://github.com/ajayrakde/Operix/issues).
 
-> Language wrappers for [OculiX](https://github.com/oculix-org/Oculix) — visual automation for the real world.
+# Pyulix
 
-Write visual-testing scripts in **Python**, **Node.js**, or **.NET** with zero
-Java knowledge. Under the hood everything routes to `oculixapi` running in a JVM.
+![Pyulix — friendly python and vision logo](docs/branding/pyulix-logo.png)
 
-## Packages
+Independent Python visual automation bridge for the OculiX Java engine.
+Maintained and supported by **Ajay Rakde**. Release target: **1.2.0b2 (beta)**.
 
-| Language | Package | Registry | Bridge |
-|---|---|---|---|
-| Python | `oculix` | PyPI | Py4J (in JVM) |
-| Node.js | `oculix` | npm | JSON-RPC over stdio |
-| .NET | `OculiX` | NuGet | JSON-RPC over stdio |
-
-## Monorepo layout
-
-```
-Operix/
-├── jvm-bridge/     # Java JSON-RPC server (shared by Node.js + .NET wrappers)
-├── python/         # PyPI: oculix (py4j-based)
-├── nodejs/         # npm: oculix (TypeScript)
-├── dotnet/         # NuGet: OculiX (C#)
-└── CDC-Operix-*.md # Design docs (one per language)
-```
-
-## Runtime dependencies
-
-- **Java 11+** (Eclipse Temurin or Azul Zulu recommended) — OculiX targets Java 17 bytecode
-- `io.github.oculix-org:oculixapi:3.0.4` auto-downloaded from Maven Central on first use
-- Apertix OpenCV 4.10.0 (transitive, bundled natives for Windows/macOS/Linux x86_64)
-
-## Quickstart
-
-### Python
 ```bash
-pip install oculix
+pip install --pre pyulix
 ```
+
 ```python
-from oculix import Screen
+from pyulix import Screen
 Screen().click("button.png")
 ```
 
-### Node.js
-```bash
-npm install oculix
-```
-```javascript
-const { Screen } = require('oculix');
-await new Screen().click("button.png");
-```
+Requires Python 3.8+ and Java 17+. The fork's JVM bridge downloads on first use
+and is cached separately at `~/.pyulix/lib/`.
 
-### .NET
-```bash
-dotnet add package OculiX
-```
-```csharp
-using OculiX;
-new Screen().Click("button.png");
-```
+- [Python documentation and migration](python/README.md)
+- [Support and bug reports](https://github.com/ajayrakde/Operix/issues)
+- [Branding and attribution audit](docs/rebranding-audit.md)
 
-## Design rationale
+## Repository contents
 
-The .NET wrapper does **not** use IKVM: IKVM 8.x only supports Java 8
-bytecode and cannot convert OculiX's Java 17 classes (verified on 19 Apr
-2026 with IKVM 8.15.0 — 0 types exported, 1085 `class format error "61.0"`
-warnings). It shares the same JVM process-bridge approach as the Node.js
-wrapper via `jvm-bridge/`.
+`python/` contains Pyulix; `jvm-bridge/` contains its JSON-RPC bridge;
+`tools/` and `docs/` contain API generation, checks, and implementation notes.
+The inherited `nodejs/` and `dotnet/` wrappers are reference sources, not supported
+Pyulix releases. Publishing them from this fork is disabled.
 
-See [CDC-Operix-DotNet.md](CDC-Operix-DotNet.md) §3 for the full rationale
-and the IKVM spike results.
+## Credits and license
 
-## License
-
-MIT — same as OculiX.
-
-## Maintainer
-
-Julien MER — JMer Consulting
+Original Operix work by Julien Mer and contributors. The original notice
+Copyright (c) 2026 oculix-org is retained verbatim in [LICENSE](LICENSE).
+See [NOTICE](NOTICE). The separately downloaded OculiX engine and its bundled
+third-party libraries retain their own licenses and notices.

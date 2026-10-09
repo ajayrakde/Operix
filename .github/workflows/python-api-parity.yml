@@ -2,7 +2,7 @@ name: Python Java API parity
 
 on:
   push:
-    branches: ['python/java-api-parity']
+    branches: ['python/java-api-parity', 'rebrand/pyulix', 'main']
     paths:
       - 'python/**'
       - 'jvm-bridge/**'
@@ -10,6 +10,7 @@ on:
       - 'docs/java-api-*.json.gz'
       - 'docs/python-api-coverage.md'
       - '.github/workflows/python-api-parity.yml'
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -36,7 +37,7 @@ jobs:
         run: python -m pip install -e ./python pytest
       - name: Test Python wrappers against real JVM and bundled OCR
         env:
-          OCULIX_OCR_TESTS: '1'
+          PYULIX_OCR_TESTS: '1'
         run: python -m pytest python/tests -q
       - name: Start Linux desktop
         if: runner.os == 'Linux'
@@ -44,7 +45,7 @@ jobs:
       - name: Validate real desktop capture, OCR, input and callbacks
         env:
           DISPLAY: ':99'
-          OCULIX_DESKTOP_TESTS: '1'
+          PYULIX_DESKTOP_TESTS: '1'
         run: python -m pytest python/tests/test_desktop.py -q
       - name: Save desktop diagnostics
         if: always()
@@ -59,14 +60,15 @@ jobs:
           python -m pip install build twine
           python -m build python
           python -m twine check python/dist/*
+          python tools/verify_python_branding.py
           python tools/verify_python_wheel.py
       - name: Validate packaged autocomplete and nullable type hints
         run: |
           python -m pip install pyright==1.1.414
-          python -m pip install --force-reinstall python/dist/oculix_operix-1.2.0b1-py3-none-any.whl
+          python -m pip install --force-reinstall python/dist/pyulix-1.2.0b2-py3-none-any.whl
           python tools/verify_python_typing.py
       - name: Check bounded dependency inventory
-        run: python tools/inventory_python_support.py --jar jvm-bridge/target/operix-jvm-bridge-1.2.0b1.jar --check
+        run: python tools/inventory_python_support.py --jar jvm-bridge/target/operix-jvm-bridge-1.2.0b2.jar --check
       - name: Check Java API inventory and explicit wrapper coverage
         run: python tools/inventory_java_api.py --check
 
@@ -97,7 +99,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view jvm-bridge-1.2.0b1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          if gh release view jvm-bridge-1.2.0b2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'exists=true' >> "$GITHUB_OUTPUT"
           else
             echo 'exists=false' >> "$GITHUB_OUTPUT"
@@ -106,18 +108,18 @@ jobs:
         if: steps.tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: jvm-bridge-1.2.0b1
+          tag_name: jvm-bridge-1.2.0b2
           target_commitish: ${{ github.sha }}
           prerelease: true
           make_latest: false
-          name: Operix typed support beta 1.2.0b1
+          name: Pyulix beta 1.2.0b2
           body: |
             Beta: typed dependency facades, nullable results and opaque handles for Oculix 4.0.0.
             Validated Linux and Windows OCR, desktop capture/search/input,
             background callbacks and clean wheel installation.
-            Distribution name: oculix-operix. Python import: oculix.
+            Distribution name: pyulix. Python import: pyulix.
           files: |
-            jvm-bridge/target/operix-jvm-bridge-1.2.0b1.jar
+            jvm-bridge/target/operix-jvm-bridge-1.2.0b2.jar
             python/dist/*
       - name: Verify automatic fork JAR download and installed wheel OCR
         run: python tools/verify_python_wheel.py --download
@@ -130,10 +132,10 @@ jobs:
             echo 'ready=true' >> "$GITHUB_OUTPUT"
           else
             echo 'ready=false' >> "$GITHUB_OUTPUT"
-            echo '::notice::PyPI publication pending: configure PYPI_API_TOKEN with access to oculix-operix.'
-            echo 'GitHub artifacts are published. PyPI requires PYPI_API_TOKEN with access to oculix-operix.' >> "$GITHUB_STEP_SUMMARY"
+            echo '::notice::PyPI publication pending: configure PYPI_API_TOKEN with access to pyulix.'
+            echo 'GitHub artifacts are published. PyPI requires PYPI_API_TOKEN with access to pyulix.' >> "$GITHUB_STEP_SUMMARY"
           fi
-      - name: Publish oculix-operix to PyPI
+      - name: Publish pyulix to PyPI
         if: steps.pypi.outputs.ready == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:

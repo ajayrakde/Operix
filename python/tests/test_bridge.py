@@ -12,11 +12,11 @@ from pathlib import Path
 
 import pytest
 
-from oculix import Location, OCR, Pattern, Region, JavaObject
-from oculix._bridge import Bridge, BridgeError, RemoteObject
+from pyulix import Location, OCR, Pattern, Region, JavaObject
+from pyulix._bridge import Bridge, BridgeError, RemoteObject
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.2.0b1.jar"
+LOCAL_JAR = REPO_ROOT / "jvm-bridge" / "target" / "operix-jvm-bridge-1.2.0b2.jar"
 
 
 def _java_available() -> bool:
@@ -99,8 +99,8 @@ def test_real_location_constructor_arguments_and_chain(bridge):
 
 
 def test_real_wrapper_constructor_interning(bridge, monkeypatch):
-    import oculix
-    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    import pyulix
+    monkeypatch.setattr(pyulix, 'default_bridge', lambda: bridge)
     location = Location(10, 20)
     assert location.setY(30) is location
     assert location.getY() == 30
@@ -126,14 +126,14 @@ def test_real_ocr_options_clone_and_chaining(bridge):
 
 
 def test_real_global_ocr_options_static_factory(bridge, monkeypatch):
-    import oculix
-    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    import pyulix
+    monkeypatch.setattr(pyulix, 'default_bridge', lambda: bridge)
     options = OCR.globalOptions()
     assert isinstance(options, OCR.Options)
     assert OCR.globalOptions() is options
 
 
-@pytest.mark.skipif(os.environ.get('OCULIX_DESKTOP_TESTS') != '1', reason='Requires a real graphical desktop; set OCULIX_DESKTOP_TESTS=1')
+@pytest.mark.skipif(os.environ.get('PYULIX_DESKTOP_TESTS') != '1', reason='Requires a real graphical desktop; set PYULIX_DESKTOP_TESTS=1')
 def test_real_virtual_region_result_and_reference_argument(bridge):
     rectangle = bridge.create('java.awt.Rectangle', [10, 20, 30, 40])
     region = bridge.call_static(Region.JAVA_CLASS, 'virtual', [rectangle])
@@ -149,7 +149,7 @@ def test_invoked_java_error_exposes_cause(bridge):
         bridge.call_static('java.lang.Integer', 'parseInt', ['not-an-integer'])
 
 
-@pytest.mark.skipif(os.environ.get('OCULIX_OCR_TESTS') != '1', reason='Opt-in native OCR smoke test; set OCULIX_OCR_TESTS=1')
+@pytest.mark.skipif(os.environ.get('PYULIX_OCR_TESTS') != '1', reason='Opt-in native OCR smoke test; set PYULIX_OCR_TESTS=1')
 @pytest.mark.parametrize("with_options", [False, True])
 def test_real_ocr_image_read(bridge, with_options):
     options = bridge.create(OCR.Options.JAVA_CLASS, [])
@@ -177,8 +177,8 @@ def test_arrays_collections_nested_references_and_char(bridge):
 
 
 def test_exact_overload_enum_keywords_and_fields(bridge, monkeypatch):
-    import oculix
-    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    import pyulix
+    monkeypatch.setattr(pyulix, 'default_bridge', lambda: bridge)
     location = Location(x=0, y=20)
     assert location.getX() == 0
     location.x = 15
@@ -189,16 +189,16 @@ def test_exact_overload_enum_keywords_and_fields(bridge, monkeypatch):
     assert enum.name() == 'SINGLE_LINE'
     assert options.psm(enum).psm() == 7
     assert options.psm.overload('org.sikuli.script.OCR$PSM')('SINGLE_LINE').psm() == 7
-    original = oculix.Settings.MoveMouseDelay
+    original = pyulix.Settings.MoveMouseDelay
     try:
-        oculix.Settings.MoveMouseDelay = 0.25
-        assert oculix.Settings.MoveMouseDelay == pytest.approx(0.25)
+        pyulix.Settings.MoveMouseDelay = 0.25
+        assert pyulix.Settings.MoveMouseDelay == pytest.approx(0.25)
     finally:
-        oculix.Settings.MoveMouseDelay = original
+        pyulix.Settings.MoveMouseDelay = original
 
 
 def test_callbacks_can_make_nested_java_calls(bridge):
-    from oculix import JavaCallback
+    from pyulix import JavaCallback
     seen = []
     def compare(a, b):
         seen.append((a, b))
@@ -217,9 +217,9 @@ def test_iterator_result_is_python_iterable(bridge):
 
 
 def test_named_binding_uses_jvm_inheritance_and_collection_types(bridge, monkeypatch):
-    import oculix
-    from oculix._api import JavaMeta, JavaObject, JavaMethod
-    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    import pyulix
+    from pyulix._api import JavaMeta, JavaObject, JavaMethod
+    monkeypatch.setattr(pyulix, 'default_bridge', lambda: bridge)
 
     # Exercise the exact generated binding path against public JDK signatures.
     def facade(name, method, signatures):
@@ -232,7 +232,7 @@ def test_named_binding_uses_jvm_inheritance_and_collection_types(bridge, monkeyp
     assert numbers.valueOf(3) == '3'
     assert numbers.valueOf(3.5) == '3.5'
     assert numbers.valueOf(None) == 'null'
-    failure = oculix.FindFailed("missing")
+    failure = pyulix.FindFailed("missing")
     # Known Oculix objects remain valid for Java reference signatures.
     assert numbers.valueOf(failure) == failure.toString()
     collections = facade('java.util.Collections', 'max', [['java.util.Collection']])
@@ -242,9 +242,9 @@ def test_named_binding_uses_jvm_inheritance_and_collection_types(bridge, monkeyp
 
 
 def test_named_varargs_accept_null_array_and_remote_array(bridge, monkeypatch):
-    import oculix
-    from oculix._api import JavaMeta, JavaObject, JavaMethod
-    monkeypatch.setattr(oculix, 'default_bridge', lambda: bridge)
+    import pyulix
+    from pyulix._api import JavaMeta, JavaObject, JavaMethod
+    monkeypatch.setattr(pyulix, 'default_bridge', lambda: bridge)
     member = {'name': 'format', 'static': True, 'varargs': True,
               'parameters': [{'name': 'format', 'type': 'java.lang.String'},
                              {'name': 'args', 'type': 'java.lang.Object[]'}]}
@@ -253,7 +253,7 @@ def test_named_varargs_accept_null_array_and_remote_array(bridge, monkeypatch):
     assert strings.format('%s %s', ['one', 'two']) == 'one two'
     assert strings.format('%s %s', 'one', 'two') == 'one two'
     assert strings.format('%s', args=['one']) == 'one'
-    failure = oculix.FindFailed('missing')
+    failure = pyulix.FindFailed('missing')
     assert strings.format('%s', failure) == failure.toString()
 
 
@@ -263,7 +263,7 @@ def test_input_maps_preserve_non_string_keys_and_reserved_names(bridge):
 
 
 def test_callback_return_is_checked_against_java_signature(bridge):
-    from oculix import JavaCallback
+    from pyulix import JavaCallback
     stream = bridge.call_static('java.util.Arrays', 'stream', [[1]], parameter_types=['java.lang.Object[]'])
     predicate = JavaCallback('java.util.function.Predicate', lambda value: 'not a boolean')
     filtered = bridge.call(stream._ref, 'filter', [predicate], parameter_types=['java.util.function.Predicate'])
